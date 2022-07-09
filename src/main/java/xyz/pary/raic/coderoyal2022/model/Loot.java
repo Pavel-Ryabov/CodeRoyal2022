@@ -5,9 +5,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import xyz.pary.raic.coderoyal2022.util.StreamUtil;
 
-public class Loot {
+public class Loot implements Point {
 
     private int id;
+    private Vec2 position;
+    private Item item;
+
+    public Loot(int id, Vec2 position, Item item) {
+        this.id = id;
+        this.position = position;
+        this.item = item;
+    }
 
     public int getId() {
         return id;
@@ -17,8 +25,6 @@ public class Loot {
         this.id = value;
     }
 
-    private Vec2 position;
-
     public Vec2 getPosition() {
         return position;
     }
@@ -26,8 +32,6 @@ public class Loot {
     public void setPosition(Vec2 value) {
         this.position = value;
     }
-
-    private Item item;
 
     public Item getItem() {
         return item;
@@ -37,10 +41,24 @@ public class Loot {
         this.item = value;
     }
 
-    public Loot(int id, Vec2 position, Item item) {
-        this.id = id;
-        this.position = position;
-        this.item = item;
+    @Override
+    public double getX() {
+        return position.getX();
+    }
+
+    @Override
+    public void setX(double value) {
+        position.setX(value);
+    }
+
+    @Override
+    public double getY() {
+        return position.getY();
+    }
+
+    @Override
+    public void setY(double value) {
+        position.setY(value);
     }
 
     public static Loot readFrom(InputStream stream) throws IOException {

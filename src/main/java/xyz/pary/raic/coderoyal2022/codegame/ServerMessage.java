@@ -150,22 +150,36 @@ public abstract class ServerMessage {
     public static class DebugUpdate extends ServerMessage {
 
         public static final int TAG = 3;
+        private int displayedTick;
 
-        public DebugUpdate() {
+        public int getDisplayedTick() {
+            return displayedTick;
+        }
+
+        public void setDisplayedTick(int displayedTick) {
+            this.displayedTick = displayedTick;
+        }
+
+        public DebugUpdate(int displayedTick) {
+            this.displayedTick = displayedTick;
         }
 
         public static DebugUpdate readFrom(InputStream stream) throws IOException {
-            return new DebugUpdate();
+            int displayedTick;
+            displayedTick = StreamUtil.readInt(stream);
+            return new DebugUpdate(displayedTick);
         }
 
         @Override
         public void writeTo(OutputStream stream) throws IOException {
-            StreamUtil.writeInt(stream, TAG);
+            StreamUtil.writeInt(stream, displayedTick);
         }
 
         @Override
         public String toString() {
             StringBuilder stringBuilder = new StringBuilder("DebugUpdate { ");
+            stringBuilder.append("displayedTick: ");
+            stringBuilder.append(String.valueOf(displayedTick));
             stringBuilder.append(" }");
             return stringBuilder.toString();
         }

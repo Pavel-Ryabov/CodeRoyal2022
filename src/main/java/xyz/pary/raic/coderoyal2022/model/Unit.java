@@ -5,169 +5,28 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import xyz.pary.raic.coderoyal2022.util.StreamUtil;
 
-public class Unit {
+public class Unit implements Point {
 
     private int id;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int value) {
-        this.id = value;
-    }
-
     private int playerId;
-
-    public int getPlayerId() {
-        return playerId;
-    }
-
-    public void setPlayerId(int value) {
-        this.playerId = value;
-    }
-
     private double health;
-
-    public double getHealth() {
-        return health;
-    }
-
-    public void setHealth(double value) {
-        this.health = value;
-    }
-
     private double shield;
-
-    public double getShield() {
-        return shield;
-    }
-
-    public void setShield(double value) {
-        this.shield = value;
-    }
-
     private int extraLives;
-
-    public int getExtraLives() {
-        return extraLives;
-    }
-
-    public void setExtraLives(int value) {
-        this.extraLives = value;
-    }
-
     private Vec2 position;
-
-    public Vec2 getPosition() {
-        return position;
-    }
-
-    public void setPosition(Vec2 value) {
-        this.position = value;
-    }
-
     private Double remainingSpawnTime;
-
-    public Double getRemainingSpawnTime() {
-        return remainingSpawnTime;
-    }
-
-    public void setRemainingSpawnTime(Double value) {
-        this.remainingSpawnTime = value;
-    }
-
     private Vec2 velocity;
-
-    public Vec2 getVelocity() {
-        return velocity;
-    }
-
-    public void setVelocity(Vec2 value) {
-        this.velocity = value;
-    }
-
     private Vec2 direction;
-
-    public Vec2 getDirection() {
-        return direction;
-    }
-
-    public void setDirection(Vec2 value) {
-        this.direction = value;
-    }
-
     private double aim;
-
-    public double getAim() {
-        return aim;
-    }
-
-    public void setAim(double value) {
-        this.aim = value;
-    }
-
     private Action action;
-
-    public Action getAction() {
-        return action;
-    }
-
-    public void setAction(Action value) {
-        this.action = value;
-    }
-
     private int healthRegenerationStartTick;
-
-    public int getHealthRegenerationStartTick() {
-        return healthRegenerationStartTick;
-    }
-
-    public void setHealthRegenerationStartTick(int value) {
-        this.healthRegenerationStartTick = value;
-    }
-
     private Integer weapon;
-
-    public Integer getWeapon() {
-        return weapon;
-    }
-
-    public void setWeapon(Integer value) {
-        this.weapon = value;
-    }
-
     private int nextShotTick;
-
-    public int getNextShotTick() {
-        return nextShotTick;
-    }
-
-    public void setNextShotTick(int value) {
-        this.nextShotTick = value;
-    }
-
     private int[] ammo;
-
-    public int[] getAmmo() {
-        return ammo;
-    }
-
-    public void setAmmo(int[] value) {
-        this.ammo = value;
-    }
-
     private int shieldPotions;
 
-    public int getShieldPotions() {
-        return shieldPotions;
-    }
-
-    public void setShieldPotions(int value) {
-        this.shieldPotions = value;
-    }
-
-    public Unit(int id, int playerId, double health, double shield, int extraLives, Vec2 position, Double remainingSpawnTime, Vec2 velocity, Vec2 direction, double aim, Action action, int healthRegenerationStartTick, Integer weapon, int nextShotTick, int[] ammo, int shieldPotions) {
+    public Unit(int id, int playerId, double health, double shield, int extraLives, Vec2 position, Double remainingSpawnTime,
+            Vec2 velocity, Vec2 direction, double aim, Action action, int healthRegenerationStartTick, Integer weapon,
+            int nextShotTick, int[] ammo, int shieldPotions) {
         this.id = id;
         this.playerId = playerId;
         this.health = health;
@@ -184,6 +43,154 @@ public class Unit {
         this.nextShotTick = nextShotTick;
         this.ammo = ammo;
         this.shieldPotions = shieldPotions;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int value) {
+        this.id = value;
+    }
+
+    public int getPlayerId() {
+        return playerId;
+    }
+
+    public void setPlayerId(int value) {
+        this.playerId = value;
+    }
+
+    public double getHealth() {
+        return health;
+    }
+
+    public void setHealth(double value) {
+        this.health = value;
+    }
+
+    public double getShield() {
+        return shield;
+    }
+
+    public void setShield(double value) {
+        this.shield = value;
+    }
+
+    public int getExtraLives() {
+        return extraLives;
+    }
+
+    public void setExtraLives(int value) {
+        this.extraLives = value;
+    }
+
+    public Vec2 getPosition() {
+        return position;
+    }
+
+    public void setPosition(Vec2 value) {
+        this.position = value;
+    }
+
+    public Double getRemainingSpawnTime() {
+        return remainingSpawnTime;
+    }
+
+    public void setRemainingSpawnTime(Double value) {
+        this.remainingSpawnTime = value;
+    }
+
+    public Vec2 getVelocity() {
+        return velocity;
+    }
+
+    public void setVelocity(Vec2 value) {
+        this.velocity = value;
+    }
+
+    public Vec2 getDirection() {
+        return direction;
+    }
+
+    public void setDirection(Vec2 value) {
+        this.direction = value;
+    }
+
+    public double getAim() {
+        return aim;
+    }
+
+    public void setAim(double value) {
+        this.aim = value;
+    }
+
+    public Action getAction() {
+        return action;
+    }
+
+    public void setAction(Action value) {
+        this.action = value;
+    }
+
+    public int getHealthRegenerationStartTick() {
+        return healthRegenerationStartTick;
+    }
+
+    public void setHealthRegenerationStartTick(int value) {
+        this.healthRegenerationStartTick = value;
+    }
+
+    public Integer getWeapon() {
+        return weapon;
+    }
+
+    public void setWeapon(Integer value) {
+        this.weapon = value;
+    }
+
+    public int getNextShotTick() {
+        return nextShotTick;
+    }
+
+    public void setNextShotTick(int value) {
+        this.nextShotTick = value;
+    }
+
+    public int[] getAmmo() {
+        return ammo;
+    }
+
+    public void setAmmo(int[] value) {
+        this.ammo = value;
+    }
+
+    public int getShieldPotions() {
+        return shieldPotions;
+    }
+
+    public void setShieldPotions(int value) {
+        this.shieldPotions = value;
+    }
+
+    @Override
+    public double getX() {
+        return position.getX();
+    }
+
+    @Override
+    public void setX(double value) {
+        position.setX(value);
+    }
+
+    @Override
+    public double getY() {
+        return position.getY();
+    }
+
+    @Override
+    public void setY(double value) {
+        position.setY(value);
     }
 
     public static Unit readFrom(InputStream stream) throws IOException {

@@ -5,77 +5,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import xyz.pary.raic.coderoyal2022.util.StreamUtil;
 
-public class Projectile {
+public class Projectile implements Point {
 
     private int id;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int value) {
-        this.id = value;
-    }
-
     private int weaponTypeIndex;
-
-    public int getWeaponTypeIndex() {
-        return weaponTypeIndex;
-    }
-
-    public void setWeaponTypeIndex(int value) {
-        this.weaponTypeIndex = value;
-    }
-
     private int shooterId;
-
-    public int getShooterId() {
-        return shooterId;
-    }
-
-    public void setShooterId(int value) {
-        this.shooterId = value;
-    }
-
     private int shooterPlayerId;
-
-    public int getShooterPlayerId() {
-        return shooterPlayerId;
-    }
-
-    public void setShooterPlayerId(int value) {
-        this.shooterPlayerId = value;
-    }
-
     private Vec2 position;
-
-    public Vec2 getPosition() {
-        return position;
-    }
-
-    public void setPosition(Vec2 value) {
-        this.position = value;
-    }
-
     private Vec2 velocity;
-
-    public Vec2 getVelocity() {
-        return velocity;
-    }
-
-    public void setVelocity(Vec2 value) {
-        this.velocity = value;
-    }
-
     private double lifeTime;
-
-    public double getLifeTime() {
-        return lifeTime;
-    }
-
-    public void setLifeTime(double value) {
-        this.lifeTime = value;
-    }
 
     public Projectile(int id, int weaponTypeIndex, int shooterId, int shooterPlayerId, Vec2 position, Vec2 velocity, double lifeTime) {
         this.id = id;
@@ -85,6 +23,82 @@ public class Projectile {
         this.position = position;
         this.velocity = velocity;
         this.lifeTime = lifeTime;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int value) {
+        this.id = value;
+    }
+
+    public int getWeaponTypeIndex() {
+        return weaponTypeIndex;
+    }
+
+    public void setWeaponTypeIndex(int value) {
+        this.weaponTypeIndex = value;
+    }
+
+    public int getShooterId() {
+        return shooterId;
+    }
+
+    public void setShooterId(int value) {
+        this.shooterId = value;
+    }
+
+    public int getShooterPlayerId() {
+        return shooterPlayerId;
+    }
+
+    public void setShooterPlayerId(int value) {
+        this.shooterPlayerId = value;
+    }
+
+    public Vec2 getPosition() {
+        return position;
+    }
+
+    public void setPosition(Vec2 value) {
+        this.position = value;
+    }
+
+    public Vec2 getVelocity() {
+        return velocity;
+    }
+
+    public void setVelocity(Vec2 value) {
+        this.velocity = value;
+    }
+
+    public double getLifeTime() {
+        return lifeTime;
+    }
+
+    public void setLifeTime(double value) {
+        this.lifeTime = value;
+    }
+
+    @Override
+    public double getX() {
+        return position.getX();
+    }
+
+    @Override
+    public void setX(double value) {
+        position.setX(value);
+    }
+
+    @Override
+    public double getY() {
+        return position.getY();
+    }
+
+    @Override
+    public void setY(double value) {
+        position.setY(value);
     }
 
     public static Projectile readFrom(InputStream stream) throws IOException {

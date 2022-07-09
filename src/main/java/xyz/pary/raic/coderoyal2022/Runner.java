@@ -22,19 +22,19 @@ public class Runner {
         outputStream = new BufferedOutputStream(socket.getOutputStream());
         StreamUtil.writeString(outputStream, token);
         StreamUtil.writeInt(outputStream, 1);
-        StreamUtil.writeInt(outputStream, 0);
         StreamUtil.writeInt(outputStream, 1);
+        StreamUtil.writeInt(outputStream, 0);
         outputStream.flush();
     }
 
     void run() throws IOException {
-        MyStrategy myStrategy = null;
+        Strategy myStrategy = new MyStrategy();
         DebugInterface debugInterface = new DebugInterface(inputStream, outputStream);
         while (true) {
             ServerMessage message = ServerMessage.readFrom(inputStream);
             if (message instanceof ServerMessage.UpdateConstants) {
                 ServerMessage.UpdateConstants updateConstantsMessage = (ServerMessage.UpdateConstants) message;
-                myStrategy = new MyStrategy(updateConstantsMessage.getConstants());
+                myStrategy.updateConstants(updateConstantsMessage.getConstants());
             } else if (message instanceof ServerMessage.GetOrder) {
                 ServerMessage.GetOrder getOrderMessage = (ServerMessage.GetOrder) message;
                 new ClientMessage.OrderMessage(myStrategy.getOrder(
@@ -46,7 +46,7 @@ public class Runner {
                 break;
             } else if (message instanceof ServerMessage.DebugUpdate) {
                 ServerMessage.DebugUpdate debugUpdateMessage = (ServerMessage.DebugUpdate) message;
-                myStrategy.debugUpdate(debugInterface);
+                myStrategy.debugUpdate(debugUpdateMessage.getDisplayedTick(), debugInterface);
                 new ClientMessage.DebugUpdateDone().writeTo(outputStream);
                 outputStream.flush();
             } else {
