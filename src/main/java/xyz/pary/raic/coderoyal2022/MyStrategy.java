@@ -42,7 +42,7 @@ public class MyStrategy implements Strategy {
                             : new Vec2(-unit.getDirection().getY(), unit.getDirection().getX()),
                     action
             ));
-            if (nearestEnemy != null) {
+            if (debugInterface != null && nearestEnemy != null) {
                 debugInterface.add(new DebugData.Segment(
                         unit.getPosition(), nearestEnemy.getPosition(), 0.25, new Color(0, 0, 1, 1))
                 );
