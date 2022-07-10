@@ -3,401 +3,60 @@ package xyz.pary.raic.coderoyal2022.model;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.EnumMap;
 import xyz.pary.raic.coderoyal2022.util.StreamUtil;
 
 public class Constants {
 
     private double ticksPerSecond;
-
-    public double getTicksPerSecond() {
-        return ticksPerSecond;
-    }
-
-    public void setTicksPerSecond(double value) {
-        this.ticksPerSecond = value;
-    }
-
     private int teamSize;
-
-    public int getTeamSize() {
-        return teamSize;
-    }
-
-    public void setTeamSize(int value) {
-        this.teamSize = value;
-    }
-
     private double initialZoneRadius;
-
-    public double getInitialZoneRadius() {
-        return initialZoneRadius;
-    }
-
-    public void setInitialZoneRadius(double value) {
-        this.initialZoneRadius = value;
-    }
-
     private double zoneSpeed;
-
-    public double getZoneSpeed() {
-        return zoneSpeed;
-    }
-
-    public void setZoneSpeed(double value) {
-        this.zoneSpeed = value;
-    }
-
     private double zoneDamagePerSecond;
-
-    public double getZoneDamagePerSecond() {
-        return zoneDamagePerSecond;
-    }
-
-    public void setZoneDamagePerSecond(double value) {
-        this.zoneDamagePerSecond = value;
-    }
-
     private double spawnTime;
-
-    public double getSpawnTime() {
-        return spawnTime;
-    }
-
-    public void setSpawnTime(double value) {
-        this.spawnTime = value;
-    }
-
     private double spawnCollisionDamagePerSecond;
-
-    public double getSpawnCollisionDamagePerSecond() {
-        return spawnCollisionDamagePerSecond;
-    }
-
-    public void setSpawnCollisionDamagePerSecond(double value) {
-        this.spawnCollisionDamagePerSecond = value;
-    }
-
     private double lootingTime;
-
-    public double getLootingTime() {
-        return lootingTime;
-    }
-
-    public void setLootingTime(double value) {
-        this.lootingTime = value;
-    }
-
     private int botPlayers;
-
-    public int getBotPlayers() {
-        return botPlayers;
-    }
-
-    public void setBotPlayers(int value) {
-        this.botPlayers = value;
-    }
-
     private double unitRadius;
-
-    public double getUnitRadius() {
-        return unitRadius;
-    }
-
-    public void setUnitRadius(double value) {
-        this.unitRadius = value;
-    }
-
     private double unitHealth;
-
-    public double getUnitHealth() {
-        return unitHealth;
-    }
-
-    public void setUnitHealth(double value) {
-        this.unitHealth = value;
-    }
-
     private double healthRegenerationPerSecond;
-
-    public double getHealthRegenerationPerSecond() {
-        return healthRegenerationPerSecond;
-    }
-
-    public void setHealthRegenerationPerSecond(double value) {
-        this.healthRegenerationPerSecond = value;
-    }
-
     private double healthRegenerationDelay;
-
-    public double getHealthRegenerationDelay() {
-        return healthRegenerationDelay;
-    }
-
-    public void setHealthRegenerationDelay(double value) {
-        this.healthRegenerationDelay = value;
-    }
-
     private double maxShield;
-
-    public double getMaxShield() {
-        return maxShield;
-    }
-
-    public void setMaxShield(double value) {
-        this.maxShield = value;
-    }
-
     private double spawnShield;
-
-    public double getSpawnShield() {
-        return spawnShield;
-    }
-
-    public void setSpawnShield(double value) {
-        this.spawnShield = value;
-    }
-
     private int extraLives;
-
-    public int getExtraLives() {
-        return extraLives;
-    }
-
-    public void setExtraLives(int value) {
-        this.extraLives = value;
-    }
-
     private double lastRespawnZoneRadius;
-
-    public double getLastRespawnZoneRadius() {
-        return lastRespawnZoneRadius;
-    }
-
-    public void setLastRespawnZoneRadius(double value) {
-        this.lastRespawnZoneRadius = value;
-    }
-
     private double fieldOfView;
-
-    public double getFieldOfView() {
-        return fieldOfView;
-    }
-
-    public void setFieldOfView(double value) {
-        this.fieldOfView = value;
-    }
-
     private double viewDistance;
-
-    public double getViewDistance() {
-        return viewDistance;
-    }
-
-    public void setViewDistance(double value) {
-        this.viewDistance = value;
-    }
-
     private boolean viewBlocking;
-
-    public boolean isViewBlocking() {
-        return viewBlocking;
-    }
-
-    public void setViewBlocking(boolean value) {
-        this.viewBlocking = value;
-    }
-
     private double rotationSpeed;
-
-    public double getRotationSpeed() {
-        return rotationSpeed;
-    }
-
-    public void setRotationSpeed(double value) {
-        this.rotationSpeed = value;
-    }
-
     private double spawnMovementSpeed;
-
-    public double getSpawnMovementSpeed() {
-        return spawnMovementSpeed;
-    }
-
-    public void setSpawnMovementSpeed(double value) {
-        this.spawnMovementSpeed = value;
-    }
-
     private double maxUnitForwardSpeed;
-
-    public double getMaxUnitForwardSpeed() {
-        return maxUnitForwardSpeed;
-    }
-
-    public void setMaxUnitForwardSpeed(double value) {
-        this.maxUnitForwardSpeed = value;
-    }
-
     private double maxUnitBackwardSpeed;
-
-    public double getMaxUnitBackwardSpeed() {
-        return maxUnitBackwardSpeed;
-    }
-
-    public void setMaxUnitBackwardSpeed(double value) {
-        this.maxUnitBackwardSpeed = value;
-    }
-
     private double unitAcceleration;
-
-    public double getUnitAcceleration() {
-        return unitAcceleration;
-    }
-
-    public void setUnitAcceleration(double value) {
-        this.unitAcceleration = value;
-    }
-
     private boolean friendlyFire;
-
-    public boolean isFriendlyFire() {
-        return friendlyFire;
-    }
-
-    public void setFriendlyFire(boolean value) {
-        this.friendlyFire = value;
-    }
-
     private double killScore;
-
-    public double getKillScore() {
-        return killScore;
-    }
-
-    public void setKillScore(double value) {
-        this.killScore = value;
-    }
-
     private double damageScoreMultiplier;
-
-    public double getDamageScoreMultiplier() {
-        return damageScoreMultiplier;
-    }
-
-    public void setDamageScoreMultiplier(double value) {
-        this.damageScoreMultiplier = value;
-    }
-
     private double scorePerPlace;
-
-    public double getScorePerPlace() {
-        return scorePerPlace;
-    }
-
-    public void setScorePerPlace(double value) {
-        this.scorePerPlace = value;
-    }
-
-    private WeaponProperties[] weapons;
-
-    public WeaponProperties[] getWeapons() {
-        return weapons;
-    }
-
-    public void setWeapons(WeaponProperties[] value) {
-        this.weapons = value;
-    }
-
-    private Integer startingWeapon;
-
-    public Integer getStartingWeapon() {
-        return startingWeapon;
-    }
-
-    public void setStartingWeapon(Integer value) {
-        this.startingWeapon = value;
-    }
-
+    private EnumMap<WeaponType, WeaponProperties> weapons;
+    private WeaponType startingWeapon;
     private int startingWeaponAmmo;
-
-    public int getStartingWeaponAmmo() {
-        return startingWeaponAmmo;
-    }
-
-    public void setStartingWeaponAmmo(int value) {
-        this.startingWeaponAmmo = value;
-    }
-
     private int maxShieldPotionsInInventory;
-
-    public int getMaxShieldPotionsInInventory() {
-        return maxShieldPotionsInInventory;
-    }
-
-    public void setMaxShieldPotionsInInventory(int value) {
-        this.maxShieldPotionsInInventory = value;
-    }
-
     private double shieldPerPotion;
-
-    public double getShieldPerPotion() {
-        return shieldPerPotion;
-    }
-
-    public void setShieldPerPotion(double value) {
-        this.shieldPerPotion = value;
-    }
-
     private double shieldPotionUseTime;
-
-    public double getShieldPotionUseTime() {
-        return shieldPotionUseTime;
-    }
-
-    public void setShieldPotionUseTime(double value) {
-        this.shieldPotionUseTime = value;
-    }
-
     private SoundProperties[] sounds;
-
-    public SoundProperties[] getSounds() {
-        return sounds;
-    }
-
-    public void setSounds(SoundProperties[] value) {
-        this.sounds = value;
-    }
-
     private Integer stepsSoundTypeIndex;
-
-    public Integer getStepsSoundTypeIndex() {
-        return stepsSoundTypeIndex;
-    }
-
-    public void setStepsSoundTypeIndex(Integer value) {
-        this.stepsSoundTypeIndex = value;
-    }
-
     private double stepsSoundTravelDistance;
-
-    public double getStepsSoundTravelDistance() {
-        return stepsSoundTravelDistance;
-    }
-
-    public void setStepsSoundTravelDistance(double value) {
-        this.stepsSoundTravelDistance = value;
-    }
-
     private Obstacle[] obstacles;
 
-    public Obstacle[] getObstacles() {
-        return obstacles;
-    }
-
-    public void setObstacles(Obstacle[] value) {
-        this.obstacles = value;
-    }
-
-    public Constants(double ticksPerSecond, int teamSize, double initialZoneRadius, double zoneSpeed, double zoneDamagePerSecond, double spawnTime, double spawnCollisionDamagePerSecond, double lootingTime, int botPlayers, double unitRadius, double unitHealth, double healthRegenerationPerSecond, double healthRegenerationDelay, double maxShield, double spawnShield, int extraLives, double lastRespawnZoneRadius, double fieldOfView, double viewDistance, boolean viewBlocking, double rotationSpeed, double spawnMovementSpeed, double maxUnitForwardSpeed, double maxUnitBackwardSpeed, double unitAcceleration, boolean friendlyFire, double killScore, double damageScoreMultiplier, double scorePerPlace, WeaponProperties[] weapons, Integer startingWeapon, int startingWeaponAmmo, int maxShieldPotionsInInventory, double shieldPerPotion, double shieldPotionUseTime, SoundProperties[] sounds, Integer stepsSoundTypeIndex, double stepsSoundTravelDistance, Obstacle[] obstacles) {
+    public Constants(double ticksPerSecond, int teamSize, double initialZoneRadius, double zoneSpeed, double zoneDamagePerSecond,
+            double spawnTime, double spawnCollisionDamagePerSecond, double lootingTime, int botPlayers, double unitRadius,
+            double unitHealth, double healthRegenerationPerSecond, double healthRegenerationDelay, double maxShield,
+            double spawnShield, int extraLives, double lastRespawnZoneRadius, double fieldOfView, double viewDistance,
+            boolean viewBlocking, double rotationSpeed, double spawnMovementSpeed, double maxUnitForwardSpeed,
+            double maxUnitBackwardSpeed, double unitAcceleration, boolean friendlyFire, double killScore,
+            double damageScoreMultiplier, double scorePerPlace, EnumMap<WeaponType, WeaponProperties> weapons, WeaponType startingWeapon,
+            int startingWeaponAmmo, int maxShieldPotionsInInventory, double shieldPerPotion, double shieldPotionUseTime,
+            SoundProperties[] sounds, Integer stepsSoundTypeIndex, double stepsSoundTravelDistance, Obstacle[] obstacles) {
         this.ticksPerSecond = ticksPerSecond;
         this.teamSize = teamSize;
         this.initialZoneRadius = initialZoneRadius;
@@ -436,6 +95,318 @@ public class Constants {
         this.sounds = sounds;
         this.stepsSoundTypeIndex = stepsSoundTypeIndex;
         this.stepsSoundTravelDistance = stepsSoundTravelDistance;
+        this.obstacles = obstacles;
+    }
+
+    public double getTicksPerSecond() {
+        return ticksPerSecond;
+    }
+
+    public void setTicksPerSecond(double ticksPerSecond) {
+        this.ticksPerSecond = ticksPerSecond;
+    }
+
+    public int getTeamSize() {
+        return teamSize;
+    }
+
+    public void setTeamSize(int teamSize) {
+        this.teamSize = teamSize;
+    }
+
+    public double getInitialZoneRadius() {
+        return initialZoneRadius;
+    }
+
+    public void setInitialZoneRadius(double initialZoneRadius) {
+        this.initialZoneRadius = initialZoneRadius;
+    }
+
+    public double getZoneSpeed() {
+        return zoneSpeed;
+    }
+
+    public void setZoneSpeed(double zoneSpeed) {
+        this.zoneSpeed = zoneSpeed;
+    }
+
+    public double getZoneDamagePerSecond() {
+        return zoneDamagePerSecond;
+    }
+
+    public void setZoneDamagePerSecond(double zoneDamagePerSecond) {
+        this.zoneDamagePerSecond = zoneDamagePerSecond;
+    }
+
+    public double getSpawnTime() {
+        return spawnTime;
+    }
+
+    public void setSpawnTime(double spawnTime) {
+        this.spawnTime = spawnTime;
+    }
+
+    public double getSpawnCollisionDamagePerSecond() {
+        return spawnCollisionDamagePerSecond;
+    }
+
+    public void setSpawnCollisionDamagePerSecond(double spawnCollisionDamagePerSecond) {
+        this.spawnCollisionDamagePerSecond = spawnCollisionDamagePerSecond;
+    }
+
+    public double getLootingTime() {
+        return lootingTime;
+    }
+
+    public void setLootingTime(double lootingTime) {
+        this.lootingTime = lootingTime;
+    }
+
+    public int getBotPlayers() {
+        return botPlayers;
+    }
+
+    public void setBotPlayers(int botPlayers) {
+        this.botPlayers = botPlayers;
+    }
+
+    public double getUnitRadius() {
+        return unitRadius;
+    }
+
+    public void setUnitRadius(double unitRadius) {
+        this.unitRadius = unitRadius;
+    }
+
+    public double getUnitHealth() {
+        return unitHealth;
+    }
+
+    public void setUnitHealth(double unitHealth) {
+        this.unitHealth = unitHealth;
+    }
+
+    public double getHealthRegenerationPerSecond() {
+        return healthRegenerationPerSecond;
+    }
+
+    public void setHealthRegenerationPerSecond(double healthRegenerationPerSecond) {
+        this.healthRegenerationPerSecond = healthRegenerationPerSecond;
+    }
+
+    public double getHealthRegenerationDelay() {
+        return healthRegenerationDelay;
+    }
+
+    public void setHealthRegenerationDelay(double healthRegenerationDelay) {
+        this.healthRegenerationDelay = healthRegenerationDelay;
+    }
+
+    public double getMaxShield() {
+        return maxShield;
+    }
+
+    public void setMaxShield(double maxShield) {
+        this.maxShield = maxShield;
+    }
+
+    public double getSpawnShield() {
+        return spawnShield;
+    }
+
+    public void setSpawnShield(double spawnShield) {
+        this.spawnShield = spawnShield;
+    }
+
+    public int getExtraLives() {
+        return extraLives;
+    }
+
+    public void setExtraLives(int extraLives) {
+        this.extraLives = extraLives;
+    }
+
+    public double getLastRespawnZoneRadius() {
+        return lastRespawnZoneRadius;
+    }
+
+    public void setLastRespawnZoneRadius(double lastRespawnZoneRadius) {
+        this.lastRespawnZoneRadius = lastRespawnZoneRadius;
+    }
+
+    public double getFieldOfView() {
+        return fieldOfView;
+    }
+
+    public void setFieldOfView(double fieldOfView) {
+        this.fieldOfView = fieldOfView;
+    }
+
+    public double getViewDistance() {
+        return viewDistance;
+    }
+
+    public void setViewDistance(double viewDistance) {
+        this.viewDistance = viewDistance;
+    }
+
+    public boolean isViewBlocking() {
+        return viewBlocking;
+    }
+
+    public void setViewBlocking(boolean viewBlocking) {
+        this.viewBlocking = viewBlocking;
+    }
+
+    public double getRotationSpeed() {
+        return rotationSpeed;
+    }
+
+    public void setRotationSpeed(double rotationSpeed) {
+        this.rotationSpeed = rotationSpeed;
+    }
+
+    public double getSpawnMovementSpeed() {
+        return spawnMovementSpeed;
+    }
+
+    public void setSpawnMovementSpeed(double spawnMovementSpeed) {
+        this.spawnMovementSpeed = spawnMovementSpeed;
+    }
+
+    public double getMaxUnitForwardSpeed() {
+        return maxUnitForwardSpeed;
+    }
+
+    public void setMaxUnitForwardSpeed(double maxUnitForwardSpeed) {
+        this.maxUnitForwardSpeed = maxUnitForwardSpeed;
+    }
+
+    public double getMaxUnitBackwardSpeed() {
+        return maxUnitBackwardSpeed;
+    }
+
+    public void setMaxUnitBackwardSpeed(double maxUnitBackwardSpeed) {
+        this.maxUnitBackwardSpeed = maxUnitBackwardSpeed;
+    }
+
+    public double getUnitAcceleration() {
+        return unitAcceleration;
+    }
+
+    public void setUnitAcceleration(double unitAcceleration) {
+        this.unitAcceleration = unitAcceleration;
+    }
+
+    public boolean isFriendlyFire() {
+        return friendlyFire;
+    }
+
+    public void setFriendlyFire(boolean friendlyFire) {
+        this.friendlyFire = friendlyFire;
+    }
+
+    public double getKillScore() {
+        return killScore;
+    }
+
+    public void setKillScore(double killScore) {
+        this.killScore = killScore;
+    }
+
+    public double getDamageScoreMultiplier() {
+        return damageScoreMultiplier;
+    }
+
+    public void setDamageScoreMultiplier(double damageScoreMultiplier) {
+        this.damageScoreMultiplier = damageScoreMultiplier;
+    }
+
+    public double getScorePerPlace() {
+        return scorePerPlace;
+    }
+
+    public void setScorePerPlace(double scorePerPlace) {
+        this.scorePerPlace = scorePerPlace;
+    }
+
+    public EnumMap<WeaponType, WeaponProperties> getWeapons() {
+        return weapons;
+    }
+
+    public void setWeapons(EnumMap<WeaponType, WeaponProperties> weapons) {
+        this.weapons = weapons;
+    }
+
+    public WeaponType getStartingWeapon() {
+        return startingWeapon;
+    }
+
+    public void setStartingWeapon(WeaponType startingWeapon) {
+        this.startingWeapon = startingWeapon;
+    }
+
+    public int getStartingWeaponAmmo() {
+        return startingWeaponAmmo;
+    }
+
+    public void setStartingWeaponAmmo(int startingWeaponAmmo) {
+        this.startingWeaponAmmo = startingWeaponAmmo;
+    }
+
+    public int getMaxShieldPotionsInInventory() {
+        return maxShieldPotionsInInventory;
+    }
+
+    public void setMaxShieldPotionsInInventory(int maxShieldPotionsInInventory) {
+        this.maxShieldPotionsInInventory = maxShieldPotionsInInventory;
+    }
+
+    public double getShieldPerPotion() {
+        return shieldPerPotion;
+    }
+
+    public void setShieldPerPotion(double shieldPerPotion) {
+        this.shieldPerPotion = shieldPerPotion;
+    }
+
+    public double getShieldPotionUseTime() {
+        return shieldPotionUseTime;
+    }
+
+    public void setShieldPotionUseTime(double shieldPotionUseTime) {
+        this.shieldPotionUseTime = shieldPotionUseTime;
+    }
+
+    public SoundProperties[] getSounds() {
+        return sounds;
+    }
+
+    public void setSounds(SoundProperties[] sounds) {
+        this.sounds = sounds;
+    }
+
+    public Integer getStepsSoundTypeIndex() {
+        return stepsSoundTypeIndex;
+    }
+
+    public void setStepsSoundTypeIndex(Integer stepsSoundTypeIndex) {
+        this.stepsSoundTypeIndex = stepsSoundTypeIndex;
+    }
+
+    public double getStepsSoundTravelDistance() {
+        return stepsSoundTravelDistance;
+    }
+
+    public void setStepsSoundTravelDistance(double stepsSoundTravelDistance) {
+        this.stepsSoundTravelDistance = stepsSoundTravelDistance;
+    }
+
+    public Obstacle[] getObstacles() {
+        return obstacles;
+    }
+
+    public void setObstacles(Obstacle[] obstacles) {
         this.obstacles = obstacles;
     }
 
@@ -498,16 +469,15 @@ public class Constants {
         damageScoreMultiplier = StreamUtil.readDouble(stream);
         double scorePerPlace;
         scorePerPlace = StreamUtil.readDouble(stream);
-        WeaponProperties[] weapons;
-        weapons = new WeaponProperties[StreamUtil.readInt(stream)];
-        for (int weaponsIndex = 0; weaponsIndex < weapons.length; weaponsIndex++) {
-            WeaponProperties weaponsElement;
-            weaponsElement = WeaponProperties.readFrom(stream);
-            weapons[weaponsIndex] = weaponsElement;
+        int weaponCount = StreamUtil.readInt(stream);
+        EnumMap<WeaponType, WeaponProperties> weapons = new EnumMap<>(WeaponType.class);
+        for (int weaponsIndex = 0; weaponsIndex < weaponCount; weaponsIndex++) {
+            WeaponProperties weaponsElement = WeaponProperties.readFrom(stream);
+            weapons.put(WeaponType.getByIndex(weaponsIndex), weaponsElement);
         }
-        Integer startingWeapon;
+        WeaponType startingWeapon;
         if (StreamUtil.readBoolean(stream)) {
-            startingWeapon = StreamUtil.readInt(stream);
+            startingWeapon = WeaponType.getByIndex(StreamUtil.readInt(stream));
         } else {
             startingWeapon = null;
         }
@@ -541,7 +511,13 @@ public class Constants {
             obstaclesElement = Obstacle.readFrom(stream);
             obstacles[obstaclesIndex] = obstaclesElement;
         }
-        return new Constants(ticksPerSecond, teamSize, initialZoneRadius, zoneSpeed, zoneDamagePerSecond, spawnTime, spawnCollisionDamagePerSecond, lootingTime, botPlayers, unitRadius, unitHealth, healthRegenerationPerSecond, healthRegenerationDelay, maxShield, spawnShield, extraLives, lastRespawnZoneRadius, fieldOfView, viewDistance, viewBlocking, rotationSpeed, spawnMovementSpeed, maxUnitForwardSpeed, maxUnitBackwardSpeed, unitAcceleration, friendlyFire, killScore, damageScoreMultiplier, scorePerPlace, weapons, startingWeapon, startingWeaponAmmo, maxShieldPotionsInInventory, shieldPerPotion, shieldPotionUseTime, sounds, stepsSoundTypeIndex, stepsSoundTravelDistance, obstacles);
+        return new Constants(ticksPerSecond, teamSize, initialZoneRadius, zoneSpeed, zoneDamagePerSecond, spawnTime,
+                spawnCollisionDamagePerSecond, lootingTime, botPlayers, unitRadius, unitHealth, healthRegenerationPerSecond,
+                healthRegenerationDelay, maxShield, spawnShield, extraLives, lastRespawnZoneRadius, fieldOfView, viewDistance,
+                viewBlocking, rotationSpeed, spawnMovementSpeed, maxUnitForwardSpeed, maxUnitBackwardSpeed, unitAcceleration,
+                friendlyFire, killScore, damageScoreMultiplier, scorePerPlace, weapons, startingWeapon, startingWeaponAmmo,
+                maxShieldPotionsInInventory, shieldPerPotion, shieldPotionUseTime, sounds, stepsSoundTypeIndex,
+                stepsSoundTravelDistance, obstacles);
     }
 
     public void writeTo(OutputStream stream) throws IOException {
@@ -574,15 +550,15 @@ public class Constants {
         StreamUtil.writeDouble(stream, killScore);
         StreamUtil.writeDouble(stream, damageScoreMultiplier);
         StreamUtil.writeDouble(stream, scorePerPlace);
-        StreamUtil.writeInt(stream, weapons.length);
-        for (WeaponProperties weaponsElement : weapons) {
+        StreamUtil.writeInt(stream, weapons.size());
+        for (WeaponProperties weaponsElement : weapons.values()) {
             weaponsElement.writeTo(stream);
         }
         if (startingWeapon == null) {
             StreamUtil.writeBoolean(stream, false);
         } else {
             StreamUtil.writeBoolean(stream, true);
-            StreamUtil.writeInt(stream, startingWeapon);
+            StreamUtil.writeInt(stream, startingWeapon.getIndex());
         }
         StreamUtil.writeInt(stream, startingWeaponAmmo);
         StreamUtil.writeInt(stream, maxShieldPotionsInInventory);
@@ -697,11 +673,11 @@ public class Constants {
         stringBuilder.append(", ");
         stringBuilder.append("weapons: ");
         stringBuilder.append("[ ");
-        for (int weaponsIndex = 0; weaponsIndex < weapons.length; weaponsIndex++) {
+        for (int weaponsIndex = 0; weaponsIndex < weapons.size(); weaponsIndex++) {
             if (weaponsIndex != 0) {
                 stringBuilder.append(", ");
             }
-            WeaponProperties weaponsElement = weapons[weaponsIndex];
+            WeaponProperties weaponsElement = weapons.get(WeaponType.getByIndex(weaponsIndex));
             stringBuilder.append(String.valueOf(weaponsElement));
         }
         stringBuilder.append(" ]");

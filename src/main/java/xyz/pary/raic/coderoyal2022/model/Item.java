@@ -7,6 +7,16 @@ import xyz.pary.raic.coderoyal2022.util.StreamUtil;
 
 public abstract class Item {
 
+    private final ItemType itemType;
+
+    public Item(ItemType itemType) {
+        this.itemType = itemType;
+    }
+
+    public ItemType getItemType() {
+        return itemType;
+    }
+
     public abstract void writeTo(OutputStream stream) throws IOException;
 
     public static Item readFrom(InputStream stream) throws IOException {
@@ -26,18 +36,15 @@ public abstract class Item {
 
         public static final int TAG = 0;
 
-        private int typeIndex;
-
-        public int getTypeIndex() {
-            return typeIndex;
-        }
-
-        public void setTypeIndex(int value) {
-            this.typeIndex = value;
-        }
+        private final WeaponType type;
 
         public Weapon(int typeIndex) {
-            this.typeIndex = typeIndex;
+            super(ItemType.WEAPON);
+            this.type = WeaponType.getByIndex(typeIndex);
+        }
+
+        public WeaponType getType() {
+            return type;
         }
 
         public static Weapon readFrom(InputStream stream) throws IOException {
@@ -49,14 +56,14 @@ public abstract class Item {
         @Override
         public void writeTo(OutputStream stream) throws IOException {
             StreamUtil.writeInt(stream, TAG);
-            StreamUtil.writeInt(stream, typeIndex);
+            StreamUtil.writeInt(stream, type.getIndex());
         }
 
         @Override
         public String toString() {
             StringBuilder stringBuilder = new StringBuilder("Weapon { ");
             stringBuilder.append("typeIndex: ");
-            stringBuilder.append(String.valueOf(typeIndex));
+            stringBuilder.append(String.valueOf(type));
             stringBuilder.append(" }");
             return stringBuilder.toString();
         }
@@ -77,6 +84,7 @@ public abstract class Item {
         }
 
         public ShieldPotions(int amount) {
+            super(ItemType.SHIELD_POTION);
             this.amount = amount;
         }
 
@@ -106,29 +114,21 @@ public abstract class Item {
 
         public static final int TAG = 2;
 
-        private int weaponTypeIndex;
+        private final WeaponType weaponType;
+        private final int amount;
 
-        public int getWeaponTypeIndex() {
-            return weaponTypeIndex;
+        public Ammo(int weaponTypeIndex, int amount) {
+            super(ItemType.AMMO);
+            this.weaponType = WeaponType.getByIndex(weaponTypeIndex);
+            this.amount = amount;
         }
 
-        public void setWeaponTypeIndex(int value) {
-            this.weaponTypeIndex = value;
+        public WeaponType getWeaponType() {
+            return weaponType;
         }
-
-        private int amount;
 
         public int getAmount() {
             return amount;
-        }
-
-        public void setAmount(int value) {
-            this.amount = value;
-        }
-
-        public Ammo(int weaponTypeIndex, int amount) {
-            this.weaponTypeIndex = weaponTypeIndex;
-            this.amount = amount;
         }
 
         public static Ammo readFrom(InputStream stream) throws IOException {
@@ -142,7 +142,7 @@ public abstract class Item {
         @Override
         public void writeTo(OutputStream stream) throws IOException {
             StreamUtil.writeInt(stream, TAG);
-            StreamUtil.writeInt(stream, weaponTypeIndex);
+            StreamUtil.writeInt(stream, weaponType.getIndex());
             StreamUtil.writeInt(stream, amount);
         }
 
@@ -150,7 +150,7 @@ public abstract class Item {
         public String toString() {
             StringBuilder stringBuilder = new StringBuilder("Ammo { ");
             stringBuilder.append("weaponTypeIndex: ");
-            stringBuilder.append(String.valueOf(weaponTypeIndex));
+            stringBuilder.append(String.valueOf(weaponType));
             stringBuilder.append(", ");
             stringBuilder.append("amount: ");
             stringBuilder.append(String.valueOf(amount));

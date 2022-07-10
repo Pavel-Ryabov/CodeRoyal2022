@@ -5,13 +5,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import xyz.pary.raic.coderoyal2022.util.StreamUtil;
 
-public class Loot implements Point {
+public class Loot<T extends Item> implements Point {
 
     private int id;
     private Vec2 position;
-    private Item item;
+    private T item;
 
-    public Loot(int id, Vec2 position, Item item) {
+    public Loot(int id, Vec2 position, T item) {
         this.id = id;
         this.position = position;
         this.item = item;
@@ -33,12 +33,16 @@ public class Loot implements Point {
         this.position = value;
     }
 
-    public Item getItem() {
+    public T getItem() {
         return item;
     }
 
-    public void setItem(Item value) {
+    public void setItem(T value) {
         this.item = value;
+    }
+
+    public ItemType getItemType() {
+        return item.getItemType();
     }
 
     @Override
@@ -68,6 +72,14 @@ public class Loot implements Point {
         position = Vec2.readFrom(stream);
         Item item;
         item = Item.readFrom(stream);
+        switch (item.getItemType()) {
+            case AMMO:
+                return new AmmoLoot(id, position, (Item.Ammo) item);
+            case SHIELD_POTION:
+                return new ShieldPotionsLoot(id, position, (Item.ShieldPotions) item);
+            case WEAPON:
+                return new WeaponLoot(id, position, (Item.Weapon) item);
+        }
         return new Loot(id, position, item);
     }
 
@@ -90,5 +102,26 @@ public class Loot implements Point {
         stringBuilder.append(String.valueOf(item));
         stringBuilder.append(" }");
         return stringBuilder.toString();
+    }
+
+    public static class WeaponLoot extends Loot<Item.Weapon> implements Point {
+
+        public WeaponLoot(int id, Vec2 position, Item.Weapon item) {
+            super(id, position, item);
+        }
+    }
+
+    public static class ShieldPotionsLoot extends Loot<Item.ShieldPotions> implements Point {
+
+        public ShieldPotionsLoot(int id, Vec2 position, Item.ShieldPotions item) {
+            super(id, position, item);
+        }
+    }
+
+    public static class AmmoLoot extends Loot<Item.Ammo> implements Point {
+
+        public AmmoLoot(int id, Vec2 position, Item.Ammo item) {
+            super(id, position, item);
+        }
     }
 }

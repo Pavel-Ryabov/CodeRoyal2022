@@ -6,19 +6,40 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import xyz.pary.raic.coderoyal2022.util.GeoUtil;
 import xyz.pary.raic.coderoyal2022.util.StreamUtil;
 
 public class Game {
+
+    public static Constants CONSTANTS;
 
     private int myId;
     private Player[] players;
     private int currentTick;
     private List<Unit> myUnits;
     private List<Unit> enemyUnits;
-    private Loot[] loot;
+    private List<Loot.AmmoLoot> ammoLoot;
+    private List<Loot.ShieldPotionsLoot> potionLoot;
+    private List<Loot.WeaponLoot> weaponLoot;
     private Projectile[] projectiles;
     private Zone zone;
     private Sound[] sounds;
+
+    public Game(int myId, Player[] players, int currentTick, List<Unit> myUnits, List<Unit> enemyUnits,
+            List<Loot.AmmoLoot> ammoLoot, List<Loot.ShieldPotionsLoot> potionLoot, List<Loot.WeaponLoot> weaponLoot,
+            Projectile[] projectiles, Zone zone, Sound[] sounds) {
+        this.myId = myId;
+        this.players = players;
+        this.currentTick = currentTick;
+        this.myUnits = myUnits;
+        this.enemyUnits = enemyUnits;
+        this.ammoLoot = ammoLoot;
+        this.potionLoot = potionLoot;
+        this.weaponLoot = weaponLoot;
+        this.projectiles = projectiles;
+        this.zone = zone;
+        this.sounds = sounds;
+    }
 
     public int getMyId() {
         return myId;
@@ -60,12 +81,28 @@ public class Game {
         this.enemyUnits = enemyUnits;
     }
 
-    public Loot[] getLoot() {
-        return loot;
+    public List<Loot.AmmoLoot> getAmmoLoot() {
+        return ammoLoot;
     }
 
-    public void setLoot(Loot[] loot) {
-        this.loot = loot;
+    public void setAmmoLoot(List<Loot.AmmoLoot> ammoLoot) {
+        this.ammoLoot = ammoLoot;
+    }
+
+    public List<Loot.ShieldPotionsLoot> getPotionLoot() {
+        return potionLoot;
+    }
+
+    public void setPotionLoot(List<Loot.ShieldPotionsLoot> potionLoot) {
+        this.potionLoot = potionLoot;
+    }
+
+    public List<Loot.WeaponLoot> getWeaponLoot() {
+        return weaponLoot;
+    }
+
+    public void setWeaponLoot(List<Loot.WeaponLoot> weaponLoot) {
+        this.weaponLoot = weaponLoot;
     }
 
     public Projectile[] getProjectiles() {
@@ -92,19 +129,6 @@ public class Game {
         this.sounds = sounds;
     }
 
-    public Game(int myId, Player[] players, int currentTick, List<Unit> myUnits, List<Unit> enemyUnits, Loot[] loot,
-            Projectile[] projectiles, Zone zone, Sound[] sounds) {
-        this.myId = myId;
-        this.players = players;
-        this.currentTick = currentTick;
-        this.myUnits = myUnits;
-        this.enemyUnits = enemyUnits;
-        this.loot = loot;
-        this.projectiles = projectiles;
-        this.zone = zone;
-        this.sounds = sounds;
-    }
-
     public static Game readFrom(InputStream stream) throws IOException {
         int myId;
         myId = StreamUtil.readInt(stream);
@@ -117,10 +141,10 @@ public class Game {
         }
         int currentTick;
         currentTick = StreamUtil.readInt(stream);
-        int units = StreamUtil.readInt(stream);
+        int unitCount = StreamUtil.readInt(stream);
         List<Unit> myUnits = new ArrayList<>();
-        List<Unit> enemyUnits = new ArrayList<>(units);
-        for (int unitsIndex = 0; unitsIndex < units; unitsIndex++) {
+        List<Unit> enemyUnits = new ArrayList<>(unitCount);
+        for (int unitsIndex = 0; unitsIndex < unitCount; unitsIndex++) {
             Unit unitsElement = Unit.readFrom(stream);
             if (unitsElement.getPlayerId() == myId) {
                 myUnits.add(unitsElement);
@@ -128,12 +152,28 @@ public class Game {
                 enemyUnits.add(unitsElement);
             }
         }
-        Loot[] loot;
-        loot = new Loot[StreamUtil.readInt(stream)];
-        for (int lootIndex = 0; lootIndex < loot.length; lootIndex++) {
-            Loot lootElement;
-            lootElement = Loot.readFrom(stream);
-            loot[lootIndex] = lootElement;
+        int lootCount = StreamUtil.readInt(stream);
+        List<Loot.AmmoLoot> ammoLoot = new ArrayList<>();
+        List<Loot.ShieldPotionsLoot> potionsLoot = new ArrayList<>();
+        List<Loot.WeaponLoot> weaponLoot = new ArrayList<>();
+        for (int lootIndex = 0; lootIndex < lootCount; lootIndex++) {
+            Loot lootElement = Loot.readFrom(stream);
+            switch (lootElement.getItemType()) {
+                case AMMO:
+                    ammoLoot.add((Loot.AmmoLoot) lootElement);
+                    break;
+                case SHIELD_POTION:
+                    potionsLoot.add((Loot.ShieldPotionsLoot) lootElement);
+                    break;
+                case WEAPON:
+                    weaponLoot.add((Loot.WeaponLoot) lootElement);
+                    break;
+            }
+            for (Unit u : myUnits) {
+                if (GeoUtil.isInsideCircle(lootElement.getPosition(), u.getPosition(), Game.CONSTANTS.getUnitRadius())) {
+                    u.addLoot(lootElement);
+                }
+            }
         }
         Projectile[] projectiles;
         projectiles = new Projectile[StreamUtil.readInt(stream)];
@@ -151,7 +191,7 @@ public class Game {
             soundsElement = Sound.readFrom(stream);
             sounds[soundsIndex] = soundsElement;
         }
-        return new Game(myId, players, currentTick, myUnits, enemyUnits, loot, projectiles, zone, sounds);
+        return new Game(myId, players, currentTick, myUnits, enemyUnits, ammoLoot, potionsLoot, weaponLoot, projectiles, zone, sounds);
     }
 
     public void writeTo(OutputStream stream) throws IOException {
@@ -168,8 +208,14 @@ public class Game {
         for (Unit unitsElement : enemyUnits) {
             unitsElement.writeTo(stream);
         }
-        StreamUtil.writeInt(stream, loot.length);
-        for (Loot lootElement : loot) {
+        StreamUtil.writeInt(stream, ammoLoot.size() + potionLoot.size() + weaponLoot.size());
+        for (Loot lootElement : ammoLoot) {
+            lootElement.writeTo(stream);
+        }
+        for (Loot lootElement : potionLoot) {
+            lootElement.writeTo(stream);
+        }
+        for (Loot lootElement : weaponLoot) {
             lootElement.writeTo(stream);
         }
         StreamUtil.writeInt(stream, projectiles.length);
@@ -213,15 +259,19 @@ public class Game {
         stringBuilder.append(enemyUnits.stream().map(u -> u.toString()).collect(Collectors.joining(", ")));
         stringBuilder.append(" ]");
         stringBuilder.append(", ");
-        stringBuilder.append("loot: ");
+        stringBuilder.append("ammoLoot: ");
         stringBuilder.append("[ ");
-        for (int lootIndex = 0; lootIndex < loot.length; lootIndex++) {
-            if (lootIndex != 0) {
-                stringBuilder.append(", ");
-            }
-            Loot lootElement = loot[lootIndex];
-            stringBuilder.append(String.valueOf(lootElement));
-        }
+        stringBuilder.append(ammoLoot.stream().map(u -> u.toString()).collect(Collectors.joining(", ")));
+        stringBuilder.append(" ]");
+        stringBuilder.append(", ");
+        stringBuilder.append("potionLoot: ");
+        stringBuilder.append("[ ");
+        stringBuilder.append(potionLoot.stream().map(u -> u.toString()).collect(Collectors.joining(", ")));
+        stringBuilder.append(" ]");
+        stringBuilder.append(", ");
+        stringBuilder.append("weaponLoot: ");
+        stringBuilder.append("[ ");
+        stringBuilder.append(weaponLoot.stream().map(u -> u.toString()).collect(Collectors.joining(", ")));
         stringBuilder.append(" ]");
         stringBuilder.append(", ");
         stringBuilder.append("projectiles: ");

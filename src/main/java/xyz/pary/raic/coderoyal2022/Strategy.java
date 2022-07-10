@@ -1,12 +1,9 @@
 package xyz.pary.raic.coderoyal2022;
 
-import xyz.pary.raic.coderoyal2022.model.Constants;
 import xyz.pary.raic.coderoyal2022.model.Game;
 import xyz.pary.raic.coderoyal2022.model.Order;
 
 public interface Strategy {
-
-    public void updateConstants(Constants constants);
 
     public Order getOrder(Game game, DebugInterface debugInterface);
 

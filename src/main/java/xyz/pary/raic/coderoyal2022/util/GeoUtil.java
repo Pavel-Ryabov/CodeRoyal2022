@@ -2,7 +2,7 @@ package xyz.pary.raic.coderoyal2022.util;
 
 import xyz.pary.raic.coderoyal2022.model.Point;
 
-public class Vec2Util {
+public class GeoUtil {
 
     public static double squaredDistance(double x1, double y1, double x2, double y2) {
         return (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
@@ -35,5 +35,21 @@ public class Vec2Util {
             }
         }
         return target;
+    }
+
+    public static boolean isInsideCircle(double x, double y, double xc, double yc, double r) {
+        return (x - xc) * (x - xc) + (y - yc) * (y - yc) <= r * r;
+    }
+
+    public static boolean isInsideCircle(Point p, Point c, double r) {
+        return isInsideCircle(p.getX(), p.getY(), c.getX(), c.getY(), r);
+    }
+
+    public static boolean isInsideCircle(double xs, double ys, double rs, double xb, double yb, double rb) {
+        return (xb - xs) * (xb - xs) + (yb - ys) * (yb - ys) + rs * rs <= rb * rb;
+    }
+
+    public static boolean isInsideCircle(Point sc, double rs, Point bc, double rb) {
+        return isInsideCircle(sc.getX(), sc.getY(), rs, bc.getX(), bc.getY(), rb);
     }
 }

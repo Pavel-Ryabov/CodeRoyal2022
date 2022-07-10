@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.BufferedOutputStream;
 import xyz.pary.raic.coderoyal2022.codegame.ClientMessage;
 import xyz.pary.raic.coderoyal2022.codegame.ServerMessage;
+import xyz.pary.raic.coderoyal2022.model.Game;
 import xyz.pary.raic.coderoyal2022.util.StreamUtil;
 
 public class Runner {
@@ -34,7 +35,7 @@ public class Runner {
             ServerMessage message = ServerMessage.readFrom(inputStream);
             if (message instanceof ServerMessage.UpdateConstants) {
                 ServerMessage.UpdateConstants updateConstantsMessage = (ServerMessage.UpdateConstants) message;
-                myStrategy.updateConstants(updateConstantsMessage.getConstants());
+                Game.CONSTANTS = updateConstantsMessage.getConstants();
             } else if (message instanceof ServerMessage.GetOrder) {
                 ServerMessage.GetOrder getOrderMessage = (ServerMessage.GetOrder) message;
                 new ClientMessage.OrderMessage(myStrategy.getOrder(

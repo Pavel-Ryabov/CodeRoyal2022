@@ -3,6 +3,10 @@ package xyz.pary.raic.coderoyal2022.model;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.List;
 import xyz.pary.raic.coderoyal2022.util.StreamUtil;
 
 public class Unit implements Point {
@@ -19,14 +23,15 @@ public class Unit implements Point {
     private double aim;
     private Action action;
     private int healthRegenerationStartTick;
-    private Integer weapon;
+    private WeaponType weapon;
     private int nextShotTick;
-    private int[] ammo;
+    private EnumMap<WeaponType, Integer> ammo;
     private int shieldPotions;
+    private List<Loot> loot;
 
     public Unit(int id, int playerId, double health, double shield, int extraLives, Vec2 position, Double remainingSpawnTime,
-            Vec2 velocity, Vec2 direction, double aim, Action action, int healthRegenerationStartTick, Integer weapon,
-            int nextShotTick, int[] ammo, int shieldPotions) {
+            Vec2 velocity, Vec2 direction, double aim, Action action, int healthRegenerationStartTick, WeaponType weapon,
+            int nextShotTick, EnumMap<WeaponType, Integer> ammo, int shieldPotions) {
         this.id = id;
         this.playerId = playerId;
         this.health = health;
@@ -141,11 +146,11 @@ public class Unit implements Point {
         this.healthRegenerationStartTick = value;
     }
 
-    public Integer getWeapon() {
+    public WeaponType getWeapon() {
         return weapon;
     }
 
-    public void setWeapon(Integer value) {
+    public void setWeapon(WeaponType value) {
         this.weapon = value;
     }
 
@@ -157,11 +162,11 @@ public class Unit implements Point {
         this.nextShotTick = value;
     }
 
-    public int[] getAmmo() {
+    public EnumMap<WeaponType, Integer> getAmmo() {
         return ammo;
     }
 
-    public void setAmmo(int[] value) {
+    public void setAmmo(EnumMap<WeaponType, Integer> value) {
         this.ammo = value;
     }
 
@@ -171,6 +176,21 @@ public class Unit implements Point {
 
     public void setShieldPotions(int value) {
         this.shieldPotions = value;
+    }
+
+    public List<Loot> getLoot() {
+        return loot == null ? Collections.emptyList() : loot;
+    }
+
+    public void setLoot(List<Loot> loot) {
+        this.loot = loot;
+    }
+
+    public void addLoot(Loot loot) {
+        if (this.loot == null) {
+            this.loot = new ArrayList<>();
+        }
+        this.loot.add(loot);
     }
 
     @Override
@@ -226,24 +246,24 @@ public class Unit implements Point {
         }
         int healthRegenerationStartTick;
         healthRegenerationStartTick = StreamUtil.readInt(stream);
-        Integer weapon;
+        WeaponType weapon;
         if (StreamUtil.readBoolean(stream)) {
-            weapon = StreamUtil.readInt(stream);
+            weapon = WeaponType.getByIndex(StreamUtil.readInt(stream));
         } else {
             weapon = null;
         }
         int nextShotTick;
         nextShotTick = StreamUtil.readInt(stream);
-        int[] ammo;
-        ammo = new int[StreamUtil.readInt(stream)];
-        for (int ammoIndex = 0; ammoIndex < ammo.length; ammoIndex++) {
-            int ammoElement;
-            ammoElement = StreamUtil.readInt(stream);
-            ammo[ammoIndex] = ammoElement;
+        int ammoCount = StreamUtil.readInt(stream);
+        EnumMap<WeaponType, Integer> ammo = new EnumMap<>(WeaponType.class);
+        for (int ammoIndex = 0; ammoIndex < ammoCount; ammoIndex++) {
+            int ammoElement = StreamUtil.readInt(stream);
+            ammo.put(WeaponType.getByIndex(ammoIndex), ammoElement);
         }
         int shieldPotions;
         shieldPotions = StreamUtil.readInt(stream);
-        return new Unit(id, playerId, health, shield, extraLives, position, remainingSpawnTime, velocity, direction, aim, action, healthRegenerationStartTick, weapon, nextShotTick, ammo, shieldPotions);
+        return new Unit(id, playerId, health, shield, extraLives, position, remainingSpawnTime, velocity, direction, aim,
+                action, healthRegenerationStartTick, weapon, nextShotTick, ammo, shieldPotions);
     }
 
     public void writeTo(OutputStream stream) throws IOException {
@@ -273,11 +293,11 @@ public class Unit implements Point {
             StreamUtil.writeBoolean(stream, false);
         } else {
             StreamUtil.writeBoolean(stream, true);
-            StreamUtil.writeInt(stream, weapon);
+            StreamUtil.writeInt(stream, weapon.getIndex());
         }
         StreamUtil.writeInt(stream, nextShotTick);
-        StreamUtil.writeInt(stream, ammo.length);
-        for (int ammoElement : ammo) {
+        StreamUtil.writeInt(stream, ammo.size());
+        for (int ammoElement : ammo.values()) {
             StreamUtil.writeInt(stream, ammoElement);
         }
         StreamUtil.writeInt(stream, shieldPotions);
@@ -330,11 +350,11 @@ public class Unit implements Point {
         stringBuilder.append(", ");
         stringBuilder.append("ammo: ");
         stringBuilder.append("[ ");
-        for (int ammoIndex = 0; ammoIndex < ammo.length; ammoIndex++) {
+        for (int ammoIndex = 0; ammoIndex < ammo.size(); ammoIndex++) {
             if (ammoIndex != 0) {
                 stringBuilder.append(", ");
             }
-            int ammoElement = ammo[ammoIndex];
+            int ammoElement = ammo.get(WeaponType.getByIndex(ammoIndex));
             stringBuilder.append(String.valueOf(ammoElement));
         }
         stringBuilder.append(" ]");

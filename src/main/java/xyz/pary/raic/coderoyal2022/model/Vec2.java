@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import static java.lang.StrictMath.sqrt;
 import xyz.pary.raic.coderoyal2022.util.StreamUtil;
-import xyz.pary.raic.coderoyal2022.util.Vec2Util;
+import xyz.pary.raic.coderoyal2022.util.GeoUtil;
 
 public class Vec2 implements Point {
 
@@ -107,23 +107,23 @@ public class Vec2 implements Point {
     }
 
     public double squredDistanceTo(Vec2 target) {
-        return Vec2Util.squaredDistance(this, target);
+        return GeoUtil.squaredDistance(this, target);
     }
 
     public double squredDistanceTo(double x, double y) {
-        return Vec2Util.squaredDistance(this.x, this.y, x, y);
+        return GeoUtil.squaredDistance(this.x, this.y, x, y);
     }
 
     public double distanceTo(Vec2 target) {
-        return Vec2Util.distance(this, target);
+        return GeoUtil.distance(this, target);
     }
 
     public double distanceTo(double x, double y) {
-        return Vec2Util.distance(this.x, this.y, x, y);
+        return GeoUtil.distance(this.x, this.y, x, y);
     }
 
-    public Vec2 getVelocity(Vec2 target, double a) {
-        Vec2 out = new Vec2(target.x - this.x, target.y - this.y);
+    public Vec2 getVelocity(Point target, double a) {
+        Vec2 out = new Vec2(target.getX() - this.x, target.getY() - this.y);
         double length = out.length();
         if (length != 0) {
             out.x = out.x / length;
