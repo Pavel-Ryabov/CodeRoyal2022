@@ -2,6 +2,7 @@ package xyz.pary.raic.coderoyal2022;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import xyz.pary.raic.coderoyal2022.debugging.Color;
 import xyz.pary.raic.coderoyal2022.debugging.DebugData;
 import xyz.pary.raic.coderoyal2022.model.ActionOrder;
@@ -32,7 +33,8 @@ public class MyStrategy implements Strategy {
             if (unit.getShield() == 0 && unit.getShieldPotions() > 0) {
                 action = new ActionOrder.UseShieldPotion();
             } else if (unit.getAmmo().get(unit.getWeapon()) == 0) {
-                Loot ammo = GeoUtil.getNearestTarget(unit, game.getAmmoLoot());
+                Loot ammo = GeoUtil.getNearestTarget(unit, game.getAmmoLoot().stream().
+                        filter(a -> a.getItem().getWeaponType() == unit.getWeapon()).collect(Collectors.toList()));
                 if (ammo != null) {
                     target = ammo.getPosition();
                     direction = ammo.getPosition();
@@ -75,10 +77,12 @@ public class MyStrategy implements Strategy {
                 } else if (action == null && target == null) {
                     action = new ActionOrder.Aim(true);
                     direction = enemy.getPosition();
+                    target = GeoUtil.getIntersect(enemy.getPosition(), Game.CONSTANTS.getViewDistance() * 0.65, unit.getPosition().rotate15());
                 }
             } else {
                 action = new ActionOrder.Aim(true);
                 direction = enemy.getPosition();
+                target = GeoUtil.getIntersect(enemy.getPosition(), Game.CONSTANTS.getViewDistance() * 0.65, unit.getPosition().rotate15());
             }
             orders.put(unit.getId(), new UnitOrder(
                     target != null
@@ -92,6 +96,14 @@ public class MyStrategy implements Strategy {
             if (debugInterface != null && target != null) {
                 debugInterface.add(new DebugData.Segment(
                         unit.getPosition(), target, 0.25, new Color(0, 0, 1, 1))
+                );
+            }
+            if (debugInterface != null && enemy != null) {
+                debugInterface.add(new DebugData.Ring(
+                        enemy.getPosition(), Game.CONSTANTS.getViewDistance() * 0.65, 0.25, new Color(0, 1, 0, 1))
+                );
+                debugInterface.add(new DebugData.Segment(
+                        enemy.getPosition(), GeoUtil.getIntersect(enemy.getPosition(), Game.CONSTANTS.getViewDistance() * 0.65, unit.getPosition()), 0.25, new Color(0, 1, 0, 1))
                 );
             }
         }

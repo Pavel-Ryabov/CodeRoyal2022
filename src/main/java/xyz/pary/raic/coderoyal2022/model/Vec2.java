@@ -9,6 +9,9 @@ import xyz.pary.raic.coderoyal2022.util.GeoUtil;
 
 public class Vec2 implements Point {
 
+    private static final double SIN15 = 0.259;
+    private static final double COS15 = 0.965;
+
     private double x;
     private double y;
 
@@ -135,6 +138,12 @@ public class Vec2 implements Point {
         out.x = out.x * a;
         out.y = out.y * a;
         return out;
+    }
+
+    public Vec2 rotate15() {
+        double dx = x * COS15 - y * SIN15;
+        double dy = x * SIN15 + y * COS15;
+        return new Vec2(dx, dy);
     }
 
     public static Vec2 readFrom(InputStream stream) throws IOException {

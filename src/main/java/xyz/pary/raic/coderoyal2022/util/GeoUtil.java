@@ -1,6 +1,7 @@
 package xyz.pary.raic.coderoyal2022.util;
 
 import xyz.pary.raic.coderoyal2022.model.Point;
+import xyz.pary.raic.coderoyal2022.model.Vec2;
 
 public class GeoUtil {
 
@@ -51,5 +52,9 @@ public class GeoUtil {
 
     public static boolean isInsideCircle(Point sc, double rs, Point bc, double rb) {
         return isInsideCircle(sc.getX(), sc.getY(), rs, bc.getX(), bc.getY(), rb);
+    }
+
+    public static Vec2 getIntersect(Vec2 circle, double radius, Vec2 outerPoint) {
+        return circle.add(circle.getVelocity(outerPoint, radius));
     }
 }
