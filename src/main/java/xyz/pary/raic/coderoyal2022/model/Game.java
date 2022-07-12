@@ -23,11 +23,11 @@ public class Game {
     private List<Loot.WeaponLoot> weaponLoot;
     private Projectile[] projectiles;
     private Zone zone;
-    private Sound[] sounds;
+    private List<Sound> sounds;
 
     public Game(int myId, Player[] players, int currentTick, List<Unit> myUnits, List<Unit> enemyUnits,
             List<Loot.AmmoLoot> ammoLoot, List<Loot.ShieldPotionsLoot> potionLoot, List<Loot.WeaponLoot> weaponLoot,
-            Projectile[] projectiles, Zone zone, Sound[] sounds) {
+            Projectile[] projectiles, Zone zone, List<Sound> sounds) {
         this.myId = myId;
         this.players = players;
         this.currentTick = currentTick;
@@ -121,11 +121,11 @@ public class Game {
         this.zone = zone;
     }
 
-    public Sound[] getSounds() {
+    public List<Sound> getSounds() {
         return sounds;
     }
 
-    public void setSounds(Sound[] sounds) {
+    public void setSounds(List<Sound> sounds) {
         this.sounds = sounds;
     }
 
@@ -178,18 +178,16 @@ public class Game {
         Projectile[] projectiles;
         projectiles = new Projectile[StreamUtil.readInt(stream)];
         for (int projectilesIndex = 0; projectilesIndex < projectiles.length; projectilesIndex++) {
-            Projectile projectilesElement;
-            projectilesElement = Projectile.readFrom(stream);
+            Projectile projectilesElement = Projectile.readFrom(stream);
             projectiles[projectilesIndex] = projectilesElement;
         }
         Zone zone;
         zone = Zone.readFrom(stream);
-        Sound[] sounds;
-        sounds = new Sound[StreamUtil.readInt(stream)];
-        for (int soundsIndex = 0; soundsIndex < sounds.length; soundsIndex++) {
-            Sound soundsElement;
-            soundsElement = Sound.readFrom(stream);
-            sounds[soundsIndex] = soundsElement;
+        int soundCount = StreamUtil.readInt(stream);
+        List<Sound> sounds = new ArrayList<>(soundCount);
+        for (int soundsIndex = 0; soundsIndex < soundCount; soundsIndex++) {
+            Sound soundsElement = Sound.readFrom(stream);
+            sounds.add(soundsElement);
         }
         return new Game(myId, players, currentTick, myUnits, enemyUnits, ammoLoot, potionsLoot, weaponLoot, projectiles, zone, sounds);
     }
@@ -223,7 +221,7 @@ public class Game {
             projectilesElement.writeTo(stream);
         }
         zone.writeTo(stream);
-        StreamUtil.writeInt(stream, sounds.length);
+        StreamUtil.writeInt(stream, sounds.size());
         for (Sound soundsElement : sounds) {
             soundsElement.writeTo(stream);
         }
@@ -290,13 +288,7 @@ public class Game {
         stringBuilder.append(", ");
         stringBuilder.append("sounds: ");
         stringBuilder.append("[ ");
-        for (int soundsIndex = 0; soundsIndex < sounds.length; soundsIndex++) {
-            if (soundsIndex != 0) {
-                stringBuilder.append(", ");
-            }
-            Sound soundsElement = sounds[soundsIndex];
-            stringBuilder.append(String.valueOf(soundsElement));
-        }
+        stringBuilder.append(sounds.stream().map(u -> u.toString()).collect(Collectors.joining(", ")));
         stringBuilder.append(" ]");
         stringBuilder.append(" }");
         return stringBuilder.toString();

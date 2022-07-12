@@ -28,6 +28,7 @@ public class Unit implements Point {
     private EnumMap<WeaponType, Integer> ammo;
     private int shieldPotions;
     private List<Loot> loot;
+    private List<Projectile> projectiles;
 
     public Unit(int id, int playerId, double health, double shield, int extraLives, Vec2 position, Double remainingSpawnTime,
             Vec2 velocity, Vec2 direction, double aim, Action action, int healthRegenerationStartTick, WeaponType weapon,
@@ -191,6 +192,21 @@ public class Unit implements Point {
             this.loot = new ArrayList<>();
         }
         this.loot.add(loot);
+    }
+
+    public List<Projectile> getProjectiles() {
+        return projectiles == null ? Collections.emptyList() : projectiles;
+    }
+
+    public void setProjectiles(List<Projectile> projectiles) {
+        this.projectiles = projectiles;
+    }
+
+    public void addProjectile(Projectile projectile) {
+        if (this.projectiles == null) {
+            this.projectiles = new ArrayList<>();
+        }
+        this.projectiles.add(projectile);
     }
 
     @Override

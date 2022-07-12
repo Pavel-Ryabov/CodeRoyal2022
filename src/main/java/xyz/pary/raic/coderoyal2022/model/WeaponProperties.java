@@ -8,136 +8,22 @@ import xyz.pary.raic.coderoyal2022.util.StreamUtil;
 public class WeaponProperties {
 
     private String name;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String value) {
-        this.name = value;
-    }
-
     private double roundsPerSecond;
-
-    public double getRoundsPerSecond() {
-        return roundsPerSecond;
-    }
-
-    public void setRoundsPerSecond(double value) {
-        this.roundsPerSecond = value;
-    }
-
     private double spread;
-
-    public double getSpread() {
-        return spread;
-    }
-
-    public void setSpread(double value) {
-        this.spread = value;
-    }
-
     private double aimTime;
-
-    public double getAimTime() {
-        return aimTime;
-    }
-
-    public void setAimTime(double value) {
-        this.aimTime = value;
-    }
-
     private double aimFieldOfView;
-
-    public double getAimFieldOfView() {
-        return aimFieldOfView;
-    }
-
-    public void setAimFieldOfView(double value) {
-        this.aimFieldOfView = value;
-    }
-
     private double aimRotationSpeed;
-
-    public double getAimRotationSpeed() {
-        return aimRotationSpeed;
-    }
-
-    public void setAimRotationSpeed(double value) {
-        this.aimRotationSpeed = value;
-    }
-
     private double aimMovementSpeedModifier;
-
-    public double getAimMovementSpeedModifier() {
-        return aimMovementSpeedModifier;
-    }
-
-    public void setAimMovementSpeedModifier(double value) {
-        this.aimMovementSpeedModifier = value;
-    }
-
     private double projectileSpeed;
-
-    public double getProjectileSpeed() {
-        return projectileSpeed;
-    }
-
-    public void setProjectileSpeed(double value) {
-        this.projectileSpeed = value;
-    }
-
     private double projectileDamage;
-
-    public double getProjectileDamage() {
-        return projectileDamage;
-    }
-
-    public void setProjectileDamage(double value) {
-        this.projectileDamage = value;
-    }
-
     private double projectileLifeTime;
-
-    public double getProjectileLifeTime() {
-        return projectileLifeTime;
-    }
-
-    public void setProjectileLifeTime(double value) {
-        this.projectileLifeTime = value;
-    }
-
-    private Integer shotSoundTypeIndex;
-
-    public Integer getShotSoundTypeIndex() {
-        return shotSoundTypeIndex;
-    }
-
-    public void setShotSoundTypeIndex(Integer value) {
-        this.shotSoundTypeIndex = value;
-    }
-
-    private Integer projectileHitSoundTypeIndex;
-
-    public Integer getProjectileHitSoundTypeIndex() {
-        return projectileHitSoundTypeIndex;
-    }
-
-    public void setProjectileHitSoundTypeIndex(Integer value) {
-        this.projectileHitSoundTypeIndex = value;
-    }
-
+    private SoundType shotSoundType;
+    private SoundType projectileHitSoundType;
     private int maxInventoryAmmo;
 
-    public int getMaxInventoryAmmo() {
-        return maxInventoryAmmo;
-    }
-
-    public void setMaxInventoryAmmo(int value) {
-        this.maxInventoryAmmo = value;
-    }
-
-    public WeaponProperties(String name, double roundsPerSecond, double spread, double aimTime, double aimFieldOfView, double aimRotationSpeed, double aimMovementSpeedModifier, double projectileSpeed, double projectileDamage, double projectileLifeTime, Integer shotSoundTypeIndex, Integer projectileHitSoundTypeIndex, int maxInventoryAmmo) {
+    public WeaponProperties(String name, double roundsPerSecond, double spread, double aimTime, double aimFieldOfView,
+            double aimRotationSpeed, double aimMovementSpeedModifier, double projectileSpeed, double projectileDamage,
+            double projectileLifeTime, SoundType shotSoundType, SoundType projectileHitSoundType, int maxInventoryAmmo) {
         this.name = name;
         this.roundsPerSecond = roundsPerSecond;
         this.spread = spread;
@@ -148,8 +34,112 @@ public class WeaponProperties {
         this.projectileSpeed = projectileSpeed;
         this.projectileDamage = projectileDamage;
         this.projectileLifeTime = projectileLifeTime;
-        this.shotSoundTypeIndex = shotSoundTypeIndex;
-        this.projectileHitSoundTypeIndex = projectileHitSoundTypeIndex;
+        this.shotSoundType = shotSoundType;
+        this.projectileHitSoundType = projectileHitSoundType;
+        this.maxInventoryAmmo = maxInventoryAmmo;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public double getRoundsPerSecond() {
+        return roundsPerSecond;
+    }
+
+    public void setRoundsPerSecond(double roundsPerSecond) {
+        this.roundsPerSecond = roundsPerSecond;
+    }
+
+    public double getSpread() {
+        return spread;
+    }
+
+    public void setSpread(double spread) {
+        this.spread = spread;
+    }
+
+    public double getAimTime() {
+        return aimTime;
+    }
+
+    public void setAimTime(double aimTime) {
+        this.aimTime = aimTime;
+    }
+
+    public double getAimFieldOfView() {
+        return aimFieldOfView;
+    }
+
+    public void setAimFieldOfView(double aimFieldOfView) {
+        this.aimFieldOfView = aimFieldOfView;
+    }
+
+    public double getAimRotationSpeed() {
+        return aimRotationSpeed;
+    }
+
+    public void setAimRotationSpeed(double aimRotationSpeed) {
+        this.aimRotationSpeed = aimRotationSpeed;
+    }
+
+    public double getAimMovementSpeedModifier() {
+        return aimMovementSpeedModifier;
+    }
+
+    public void setAimMovementSpeedModifier(double aimMovementSpeedModifier) {
+        this.aimMovementSpeedModifier = aimMovementSpeedModifier;
+    }
+
+    public double getProjectileSpeed() {
+        return projectileSpeed;
+    }
+
+    public void setProjectileSpeed(double projectileSpeed) {
+        this.projectileSpeed = projectileSpeed;
+    }
+
+    public double getProjectileDamage() {
+        return projectileDamage;
+    }
+
+    public void setProjectileDamage(double projectileDamage) {
+        this.projectileDamage = projectileDamage;
+    }
+
+    public double getProjectileLifeTime() {
+        return projectileLifeTime;
+    }
+
+    public void setProjectileLifeTime(double projectileLifeTime) {
+        this.projectileLifeTime = projectileLifeTime;
+    }
+
+    public SoundType getShotSoundType() {
+        return shotSoundType;
+    }
+
+    public void setShotSoundType(SoundType shotSoundType) {
+        this.shotSoundType = shotSoundType;
+    }
+
+    public SoundType getProjectileHitSoundType() {
+        return projectileHitSoundType;
+    }
+
+    public void setProjectileHitSoundType(SoundType projectileHitSoundType) {
+        this.projectileHitSoundType = projectileHitSoundType;
+    }
+
+    public int getMaxInventoryAmmo() {
+        return maxInventoryAmmo;
+    }
+
+    public void setMaxInventoryAmmo(int maxInventoryAmmo) {
         this.maxInventoryAmmo = maxInventoryAmmo;
     }
 
@@ -174,21 +164,22 @@ public class WeaponProperties {
         projectileDamage = StreamUtil.readDouble(stream);
         double projectileLifeTime;
         projectileLifeTime = StreamUtil.readDouble(stream);
-        Integer shotSoundTypeIndex;
+        SoundType shotSoundType;
         if (StreamUtil.readBoolean(stream)) {
-            shotSoundTypeIndex = StreamUtil.readInt(stream);
+            shotSoundType = SoundType.getByIndex(StreamUtil.readInt(stream));
         } else {
-            shotSoundTypeIndex = null;
+            shotSoundType = null;
         }
-        Integer projectileHitSoundTypeIndex;
+        SoundType projectileHitSoundType;
         if (StreamUtil.readBoolean(stream)) {
-            projectileHitSoundTypeIndex = StreamUtil.readInt(stream);
+            projectileHitSoundType = SoundType.getByIndex(StreamUtil.readInt(stream));
         } else {
-            projectileHitSoundTypeIndex = null;
+            projectileHitSoundType = null;
         }
         int maxInventoryAmmo;
         maxInventoryAmmo = StreamUtil.readInt(stream);
-        return new WeaponProperties(name, roundsPerSecond, spread, aimTime, aimFieldOfView, aimRotationSpeed, aimMovementSpeedModifier, projectileSpeed, projectileDamage, projectileLifeTime, shotSoundTypeIndex, projectileHitSoundTypeIndex, maxInventoryAmmo);
+        return new WeaponProperties(name, roundsPerSecond, spread, aimTime, aimFieldOfView, aimRotationSpeed, aimMovementSpeedModifier,
+                projectileSpeed, projectileDamage, projectileLifeTime, shotSoundType, projectileHitSoundType, maxInventoryAmmo);
     }
 
     public void writeTo(OutputStream stream) throws IOException {
@@ -202,17 +193,17 @@ public class WeaponProperties {
         StreamUtil.writeDouble(stream, projectileSpeed);
         StreamUtil.writeDouble(stream, projectileDamage);
         StreamUtil.writeDouble(stream, projectileLifeTime);
-        if (shotSoundTypeIndex == null) {
+        if (shotSoundType == null) {
             StreamUtil.writeBoolean(stream, false);
         } else {
             StreamUtil.writeBoolean(stream, true);
-            StreamUtil.writeInt(stream, shotSoundTypeIndex);
+            StreamUtil.writeInt(stream, shotSoundType.getIndex());
         }
-        if (projectileHitSoundTypeIndex == null) {
+        if (projectileHitSoundType == null) {
             StreamUtil.writeBoolean(stream, false);
         } else {
             StreamUtil.writeBoolean(stream, true);
-            StreamUtil.writeInt(stream, projectileHitSoundTypeIndex);
+            StreamUtil.writeInt(stream, projectileHitSoundType.getIndex());
         }
         StreamUtil.writeInt(stream, maxInventoryAmmo);
     }
@@ -250,11 +241,11 @@ public class WeaponProperties {
         stringBuilder.append("projectileLifeTime: ");
         stringBuilder.append(String.valueOf(projectileLifeTime));
         stringBuilder.append(", ");
-        stringBuilder.append("shotSoundTypeIndex: ");
-        stringBuilder.append(String.valueOf(shotSoundTypeIndex));
+        stringBuilder.append("shotSoundType: ");
+        stringBuilder.append(String.valueOf(shotSoundType));
         stringBuilder.append(", ");
-        stringBuilder.append("projectileHitSoundTypeIndex: ");
-        stringBuilder.append(String.valueOf(projectileHitSoundTypeIndex));
+        stringBuilder.append("projectileHitSoundType: ");
+        stringBuilder.append(String.valueOf(projectileHitSoundType));
         stringBuilder.append(", ");
         stringBuilder.append("maxInventoryAmmo: ");
         stringBuilder.append(String.valueOf(maxInventoryAmmo));

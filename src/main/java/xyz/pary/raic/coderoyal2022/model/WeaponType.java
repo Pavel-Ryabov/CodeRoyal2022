@@ -2,6 +2,7 @@ package xyz.pary.raic.coderoyal2022.model;
 
 public enum WeaponType {
     MAGIC_WAND(0), STAFF(1), BOW(2);
+    
     private final int index;
 
     private WeaponType(int index) {

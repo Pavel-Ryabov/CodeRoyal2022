@@ -5,42 +5,60 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import xyz.pary.raic.coderoyal2022.util.StreamUtil;
 
-public class Sound {
+public class Sound implements Point {
 
-    private int typeIndex;
-
-    public int getTypeIndex() {
-        return typeIndex;
-    }
-
-    public void setTypeIndex(int value) {
-        this.typeIndex = value;
-    }
-
+    private SoundType type;
     private int unitId;
+    private Vec2 position;
+
+    public Sound(int typeIndex, int unitId, Vec2 position) {
+        this.type = SoundType.getByIndex(typeIndex);
+        this.unitId = unitId;
+        this.position = position;
+    }
+
+    public SoundType getType() {
+        return type;
+    }
+
+    public void setType(SoundType type) {
+        this.type = type;
+    }
 
     public int getUnitId() {
         return unitId;
     }
 
-    public void setUnitId(int value) {
-        this.unitId = value;
+    public void setUnitId(int unitId) {
+        this.unitId = unitId;
     }
-
-    private Vec2 position;
 
     public Vec2 getPosition() {
         return position;
     }
 
-    public void setPosition(Vec2 value) {
-        this.position = value;
+    public void setPosition(Vec2 position) {
+        this.position = position;
     }
 
-    public Sound(int typeIndex, int unitId, Vec2 position) {
-        this.typeIndex = typeIndex;
-        this.unitId = unitId;
-        this.position = position;
+    @Override
+    public double getX() {
+        return position.getX();
+    }
+
+    @Override
+    public void setX(double value) {
+        position.setX(value);
+    }
+
+    @Override
+    public double getY() {
+        return position.getY();
+    }
+
+    @Override
+    public void setY(double value) {
+        position.setY(value);
     }
 
     public static Sound readFrom(InputStream stream) throws IOException {
@@ -54,7 +72,7 @@ public class Sound {
     }
 
     public void writeTo(OutputStream stream) throws IOException {
-        StreamUtil.writeInt(stream, typeIndex);
+        StreamUtil.writeInt(stream, type.getIndex());
         StreamUtil.writeInt(stream, unitId);
         position.writeTo(stream);
     }
@@ -63,7 +81,7 @@ public class Sound {
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder("Sound { ");
         stringBuilder.append("typeIndex: ");
-        stringBuilder.append(String.valueOf(typeIndex));
+        stringBuilder.append(String.valueOf(type));
         stringBuilder.append(", ");
         stringBuilder.append("unitId: ");
         stringBuilder.append(String.valueOf(unitId));

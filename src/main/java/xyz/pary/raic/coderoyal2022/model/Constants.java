@@ -43,8 +43,8 @@ public class Constants {
     private int maxShieldPotionsInInventory;
     private double shieldPerPotion;
     private double shieldPotionUseTime;
-    private SoundProperties[] sounds;
-    private Integer stepsSoundTypeIndex;
+    private EnumMap<SoundType, SoundProperties> sounds;
+    private SoundType stepsSoundType;
     private double stepsSoundTravelDistance;
     private Obstacle[] obstacles;
 
@@ -56,7 +56,7 @@ public class Constants {
             double maxUnitBackwardSpeed, double unitAcceleration, boolean friendlyFire, double killScore,
             double damageScoreMultiplier, double scorePerPlace, EnumMap<WeaponType, WeaponProperties> weapons, WeaponType startingWeapon,
             int startingWeaponAmmo, int maxShieldPotionsInInventory, double shieldPerPotion, double shieldPotionUseTime,
-            SoundProperties[] sounds, Integer stepsSoundTypeIndex, double stepsSoundTravelDistance, Obstacle[] obstacles) {
+            EnumMap<SoundType, SoundProperties> sounds, SoundType stepsSoundType, double stepsSoundTravelDistance, Obstacle[] obstacles) {
         this.ticksPerSecond = ticksPerSecond;
         this.teamSize = teamSize;
         this.initialZoneRadius = initialZoneRadius;
@@ -93,7 +93,7 @@ public class Constants {
         this.shieldPerPotion = shieldPerPotion;
         this.shieldPotionUseTime = shieldPotionUseTime;
         this.sounds = sounds;
-        this.stepsSoundTypeIndex = stepsSoundTypeIndex;
+        this.stepsSoundType = stepsSoundType;
         this.stepsSoundTravelDistance = stepsSoundTravelDistance;
         this.obstacles = obstacles;
     }
@@ -378,20 +378,20 @@ public class Constants {
         this.shieldPotionUseTime = shieldPotionUseTime;
     }
 
-    public SoundProperties[] getSounds() {
+    public EnumMap<SoundType, SoundProperties> getSounds() {
         return sounds;
     }
 
-    public void setSounds(SoundProperties[] sounds) {
+    public void setSounds(EnumMap<SoundType, SoundProperties> sounds) {
         this.sounds = sounds;
     }
 
-    public Integer getStepsSoundTypeIndex() {
-        return stepsSoundTypeIndex;
+    public SoundType getStepsSoundType() {
+        return stepsSoundType;
     }
 
-    public void setStepsSoundTypeIndex(Integer stepsSoundTypeIndex) {
-        this.stepsSoundTypeIndex = stepsSoundTypeIndex;
+    public void setStepsSoundType(SoundType stepsSoundType) {
+        this.stepsSoundType = stepsSoundType;
     }
 
     public double getStepsSoundTravelDistance() {
@@ -489,18 +489,17 @@ public class Constants {
         shieldPerPotion = StreamUtil.readDouble(stream);
         double shieldPotionUseTime;
         shieldPotionUseTime = StreamUtil.readDouble(stream);
-        SoundProperties[] sounds;
-        sounds = new SoundProperties[StreamUtil.readInt(stream)];
-        for (int soundsIndex = 0; soundsIndex < sounds.length; soundsIndex++) {
-            SoundProperties soundsElement;
-            soundsElement = SoundProperties.readFrom(stream);
-            sounds[soundsIndex] = soundsElement;
+        int soundsCount = StreamUtil.readInt(stream);
+        EnumMap<SoundType, SoundProperties> sounds = new EnumMap<>(SoundType.class);
+        for (int soundsIndex = 0; soundsIndex < soundsCount; soundsIndex++) {
+            SoundProperties soundsElement = SoundProperties.readFrom(stream);
+            sounds.put(SoundType.getByIndex(soundsIndex), soundsElement);
         }
-        Integer stepsSoundTypeIndex;
+        SoundType stepsSoundType;
         if (StreamUtil.readBoolean(stream)) {
-            stepsSoundTypeIndex = StreamUtil.readInt(stream);
+            stepsSoundType = SoundType.getByIndex(StreamUtil.readInt(stream));
         } else {
-            stepsSoundTypeIndex = null;
+            stepsSoundType = null;
         }
         double stepsSoundTravelDistance;
         stepsSoundTravelDistance = StreamUtil.readDouble(stream);
@@ -516,7 +515,7 @@ public class Constants {
                 healthRegenerationDelay, maxShield, spawnShield, extraLives, lastRespawnZoneRadius, fieldOfView, viewDistance,
                 viewBlocking, rotationSpeed, spawnMovementSpeed, maxUnitForwardSpeed, maxUnitBackwardSpeed, unitAcceleration,
                 friendlyFire, killScore, damageScoreMultiplier, scorePerPlace, weapons, startingWeapon, startingWeaponAmmo,
-                maxShieldPotionsInInventory, shieldPerPotion, shieldPotionUseTime, sounds, stepsSoundTypeIndex,
+                maxShieldPotionsInInventory, shieldPerPotion, shieldPotionUseTime, sounds, stepsSoundType,
                 stepsSoundTravelDistance, obstacles);
     }
 
@@ -564,15 +563,15 @@ public class Constants {
         StreamUtil.writeInt(stream, maxShieldPotionsInInventory);
         StreamUtil.writeDouble(stream, shieldPerPotion);
         StreamUtil.writeDouble(stream, shieldPotionUseTime);
-        StreamUtil.writeInt(stream, sounds.length);
-        for (SoundProperties soundsElement : sounds) {
+        StreamUtil.writeInt(stream, sounds.size());
+        for (SoundProperties soundsElement : sounds.values()) {
             soundsElement.writeTo(stream);
         }
-        if (stepsSoundTypeIndex == null) {
+        if (stepsSoundType == null) {
             StreamUtil.writeBoolean(stream, false);
         } else {
             StreamUtil.writeBoolean(stream, true);
-            StreamUtil.writeInt(stream, stepsSoundTypeIndex);
+            StreamUtil.writeInt(stream, stepsSoundType.getIndex());
         }
         StreamUtil.writeDouble(stream, stepsSoundTravelDistance);
         StreamUtil.writeInt(stream, obstacles.length);
@@ -699,17 +698,17 @@ public class Constants {
         stringBuilder.append(", ");
         stringBuilder.append("sounds: ");
         stringBuilder.append("[ ");
-        for (int soundsIndex = 0; soundsIndex < sounds.length; soundsIndex++) {
+        for (int soundsIndex = 0; soundsIndex < sounds.size(); soundsIndex++) {
             if (soundsIndex != 0) {
                 stringBuilder.append(", ");
             }
-            SoundProperties soundsElement = sounds[soundsIndex];
+            SoundProperties soundsElement = sounds.get(SoundType.getByIndex(soundsIndex));
             stringBuilder.append(String.valueOf(soundsElement));
         }
         stringBuilder.append(" ]");
         stringBuilder.append(", ");
-        stringBuilder.append("stepsSoundTypeIndex: ");
-        stringBuilder.append(String.valueOf(stepsSoundTypeIndex));
+        stringBuilder.append("stepsSoundType: ");
+        stringBuilder.append(String.valueOf(stepsSoundType));
         stringBuilder.append(", ");
         stringBuilder.append("stepsSoundTravelDistance: ");
         stringBuilder.append(String.valueOf(stepsSoundTravelDistance));
