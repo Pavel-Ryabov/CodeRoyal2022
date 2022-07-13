@@ -57,4 +57,8 @@ public class GeoUtil {
     public static Vec2 getIntersect(Vec2 circle, double radius, Vec2 outerPoint) {
         return circle.add(circle.getVelocity(outerPoint, radius));
     }
+
+    public static double getAngle(Vec2 v1, Vec2 v2) {
+        return Math.toDegrees(Math.acos(v1.dotProduct(v2) / (v1.length() * v2.length())));
+    }
 }

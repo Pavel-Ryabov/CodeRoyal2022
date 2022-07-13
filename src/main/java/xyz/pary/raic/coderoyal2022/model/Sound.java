@@ -7,14 +7,21 @@ import xyz.pary.raic.coderoyal2022.util.StreamUtil;
 
 public class Sound implements Point {
 
+    private final int tick;
+
     private SoundType type;
     private int unitId;
     private Vec2 position;
 
-    public Sound(int typeIndex, int unitId, Vec2 position) {
+    public Sound(int tick, int typeIndex, int unitId, Vec2 position) {
+        this.tick = tick;
         this.type = SoundType.getByIndex(typeIndex);
         this.unitId = unitId;
         this.position = position;
+    }
+
+    public int getTick() {
+        return tick;
     }
 
     public SoundType getType() {
@@ -61,14 +68,14 @@ public class Sound implements Point {
         position.setY(value);
     }
 
-    public static Sound readFrom(InputStream stream) throws IOException {
+    public static Sound readFrom(InputStream stream, int tick) throws IOException {
         int typeIndex;
         typeIndex = StreamUtil.readInt(stream);
         int unitId;
         unitId = StreamUtil.readInt(stream);
         Vec2 position;
         position = Vec2.readFrom(stream);
-        return new Sound(typeIndex, unitId, position);
+        return new Sound(tick, typeIndex, unitId, position);
     }
 
     public void writeTo(OutputStream stream) throws IOException {
@@ -80,6 +87,9 @@ public class Sound implements Point {
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder("Sound { ");
+        stringBuilder.append("tick: ");
+        stringBuilder.append(String.valueOf(tick));
+        stringBuilder.append(", ");
         stringBuilder.append("typeIndex: ");
         stringBuilder.append(String.valueOf(type));
         stringBuilder.append(", ");

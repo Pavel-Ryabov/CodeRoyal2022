@@ -186,7 +186,7 @@ public class Game {
         int soundCount = StreamUtil.readInt(stream);
         List<Sound> sounds = new ArrayList<>(soundCount);
         for (int soundsIndex = 0; soundsIndex < soundCount; soundsIndex++) {
-            Sound soundsElement = Sound.readFrom(stream);
+            Sound soundsElement = Sound.readFrom(stream, currentTick);
             sounds.add(soundsElement);
         }
         return new Game(myId, players, currentTick, myUnits, enemyUnits, ammoLoot, potionsLoot, weaponLoot, projectiles, zone, sounds);

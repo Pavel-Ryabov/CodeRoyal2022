@@ -1,6 +1,9 @@
 package xyz.pary.raic.coderoyal2022;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import xyz.pary.raic.coderoyal2022.debugging.Color;
@@ -22,15 +25,24 @@ import xyz.pary.raic.coderoyal2022.util.GeoUtil;
 
 public class MyStrategy implements Strategy {
 
+    private final List<Sound> sounds = new ArrayList<>();
+
     @Override
     public Order getOrder(Game game, DebugInterface debugInterface) {
         Map<Integer, UnitOrder> orders = new HashMap<>();
         Zone zone = game.getZone();
+        for (Iterator<Sound> it = sounds.iterator(); it.hasNext();) {
+            Sound next = it.next();
+            if (next.getTick() + 6 < game.getCurrentTick()) {
+                it.remove();
+            }
+        }
+        sounds.addAll(game.getSounds());
         for (Unit unit : game.getMyUnits()) {
             Vec2 target = null;
             Vec2 direction = null;
             Unit enemy = GeoUtil.getNearestTarget(unit, game.getEnemyUnits());
-            Sound sound = GeoUtil.getNearestTarget(unit, game.getSounds());
+            Sound sound = GeoUtil.getNearestTarget(unit, this.sounds);
             ActionOrder action = null;
             if (unit.getShield() == 0 && unit.getShieldPotions() > 0) {
                 action = new ActionOrder.UseShieldPotion();
@@ -46,8 +58,11 @@ public class MyStrategy implements Strategy {
                 }
             } else if (sound != null && enemy != null
                     && sound.getPosition().squredDistanceTo(unit.getPosition()) < enemy.getPosition().squredDistanceTo(unit.getPosition())) {
-                target = sound.getPosition();
-                direction = sound.getPosition();
+                double angle = GeoUtil.getAngle(sound.getPosition().sub(unit.getPosition()), unit.getDirection());
+                if (angle != Double.NaN && angle > Game.CONSTANTS.getWeapons().get(unit.getWeapon()).getAimFieldOfView() / 2) {
+                    target = sound.getPosition();
+                    direction = sound.getPosition();
+                }
             } else if (enemy == null || unit.getPosition().distanceTo(enemy.getPosition()) >= Game.CONSTANTS.getViewDistance() * 0.60) {
                 if (!unit.getLoot().isEmpty()) {
                     for (Loot l : unit.getLoot()) {
@@ -94,13 +109,13 @@ public class MyStrategy implements Strategy {
                     action = new ActionOrder.Aim(true);
                     direction = enemy.getPosition();
                     target = GeoUtil.getIntersect(enemy.getPosition(), Game.CONSTANTS.getViewDistance() * 0.60,
-                            enemy.getPosition().sub(unit.getPosition()).rotate15());
+                            unit.getPosition()).rotate15();
                 }
             } else {
                 action = new ActionOrder.Aim(true);
                 direction = enemy.getPosition();
-                target = GeoUtil.getIntersect(enemy.getPosition(),
-                        Game.CONSTANTS.getViewDistance() * 0.60, enemy.getPosition().sub(unit.getPosition()).rotate15());
+                target = GeoUtil.getIntersect(enemy.getPosition(), Game.CONSTANTS.getViewDistance() * 0.60,
+                        unit.getPosition()).rotate15();
             }
             orders.put(unit.getId(), new UnitOrder(
                     target != null
@@ -121,7 +136,12 @@ public class MyStrategy implements Strategy {
                         enemy.getPosition(), Game.CONSTANTS.getViewDistance() * 0.60, 0.25, new Color(0, 1, 0, 1))
                 );
                 debugInterface.add(new DebugData.Segment(
-                        enemy.getPosition(), GeoUtil.getIntersect(enemy.getPosition(), Game.CONSTANTS.getViewDistance() * 0.60, unit.getPosition()), 0.25, new Color(0, 1, 0, 1))
+                        enemy.getPosition(), GeoUtil.getIntersect(enemy.getPosition(),
+                        Game.CONSTANTS.getViewDistance() * 0.60, unit.getPosition()), 0.25, new Color(0, 1, 0, 1))
+                );
+                debugInterface.add(new DebugData.Segment(
+                        enemy.getPosition(), GeoUtil.getIntersect(enemy.getPosition(),
+                        Game.CONSTANTS.getViewDistance() * 0.60, unit.getPosition()).rotate15(), 0.25, new Color(1, 0, 0, 1))
                 );
             }
             if (debugInterface != null && enemy != null) {
@@ -129,6 +149,21 @@ public class MyStrategy implements Strategy {
                         enemy.getPosition(), enemy.getPosition().add(enemy.getVelocity().normalize()
                         .mul(Game.CONSTANTS.getMaxUnitForwardSpeed() / Game.CONSTANTS.getTicksPerSecond())),
                         0.1, new Color(1, 0, 0, 1))
+                );
+            }
+            if (debugInterface != null && enemy != null) {
+                debugInterface.add(new DebugData.Ring(
+                        enemy.getPosition(), Game.CONSTANTS.getUnitRadius() * 1.1, 0.25, new Color(0, 0, 0, 1))
+                );
+            }
+            if (debugInterface != null && sound != null) {
+                debugInterface.add(new DebugData.Segment(
+                        sound.getPosition(), unit.getPosition(), 0.25, new Color(0, 0, 0, 1))
+                );
+            }
+            if (debugInterface != null) {
+                debugInterface.add(new DebugData.GradientSegment(
+                        unit.getPosition(), new Color(0, 0, 1, 1), unit.getPosition().add(unit.getDirection().mul(20)), new Color(1, 0, 0, 1), 0.25)
                 );
             }
         }
