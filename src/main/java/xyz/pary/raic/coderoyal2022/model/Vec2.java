@@ -10,7 +10,7 @@ import xyz.pary.raic.coderoyal2022.util.GeoUtil;
 public class Vec2 implements Point {
 
     private static final double SIN15 = 0.259;
-    private static final double COS15 = 0.965;
+    private static final double COS15 = 0.966;
 
     private double x;
     private double y;
