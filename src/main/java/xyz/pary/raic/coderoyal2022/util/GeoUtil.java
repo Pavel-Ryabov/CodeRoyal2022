@@ -21,6 +21,18 @@ public class GeoUtil {
         return distance(a.getX(), a.getY(), b.getX(), b.getY());
     }
 
+    public static double crossProduct(double x1, double y1, double x2, double y2) {
+        return x1 * y2 - y1 * x2;
+    }
+
+    public static double dotProduct(double x1, double y1, double x2, double y2) {
+        return x1 * x2 + y1 * y2;
+    }
+
+    public static double dotProduct(Point p1, Point p2) {
+        return dotProduct(p1.getX(), p1.getY(), p2.getX(), p2.getY());
+    }
+
     public static <T extends Point> T getNearestTarget(Point v, Iterable<T> targets) {
         return getNearestTarget(v.getX(), v.getY(), targets);
     }
@@ -60,5 +72,42 @@ public class GeoUtil {
 
     public static double getAngle(Vec2 v1, Vec2 v2) {
         return Math.toDegrees(Math.acos(v1.dotProduct(v2) / (v1.length() * v2.length())));
+    }
+
+    public static double triangleArea(double x1, double y1, double x2, double y2, double x3, double y3) {
+        double abx = x2 - x1;
+        double aby = y2 - y1;
+        double acx = x3 - x1;
+        double acy = y3 - y1;
+        return Math.abs(crossProduct(abx, aby, acx, acy)) / 2;
+    }
+
+    public static double triangleArea(Vec2 a, Vec2 b, Vec2 c) {
+        return triangleArea(a.getX(), a.getY(), b.getX(), b.getY(), c.getX(), c.getY());
+    }
+
+    public static boolean isLineIntersectCircle(double x1, double y1, double x2, double y2, double xc, double yc, double r) {
+        double minDist = 2 * triangleArea(x1, y1, x2, y2, xc, yc) / distance(x1, y1, x2, y2);
+        return minDist <= r;
+    }
+
+    public static boolean isLineIntersectCircle(Point p1, Point p2, Point c, double r) {
+        return isLineIntersectCircle(p1.getX(), p1.getY(), p2.getX(), p2.getY(), c.getX(), c.getY(), r);
+    }
+
+    public static boolean isIntersect(Vec2 point1, Vec2 point2, Vec2 circle, double r) {
+        Vec2 d = point2.sub(point1);
+        Vec2 f = point1.sub(circle);
+        double a = dotProduct(d, d);
+        double b = 2 * dotProduct(f, d);
+        double c = dotProduct(f, f) - r * r;
+        double discr = b * b - 4 * a * c;
+        if (discr < 0) {
+            return false;
+        }
+        discr = Math.sqrt(discr);
+        double t1 = (-b - discr) / (2 * a);
+        double t2 = (-b + discr) / (2 * a);
+        return (t1 >= 0 && t1 <= 1) || (t2 >= 0 && t2 <= 1);
     }
 }
