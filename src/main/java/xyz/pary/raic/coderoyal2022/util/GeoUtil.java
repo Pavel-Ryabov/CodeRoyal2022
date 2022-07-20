@@ -25,6 +25,10 @@ public class GeoUtil {
         return x1 * y2 - y1 * x2;
     }
 
+    public static double crossProduct(Point p1, Point p2) {
+        return crossProduct(p1.getX(), p1.getY(), p2.getX(), p2.getY());
+    }
+
     public static double dotProduct(double x1, double y1, double x2, double y2) {
         return x1 * x2 + y1 * y2;
     }

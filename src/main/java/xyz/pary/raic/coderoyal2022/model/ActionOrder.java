@@ -7,6 +7,16 @@ import xyz.pary.raic.coderoyal2022.util.StreamUtil;
 
 public abstract class ActionOrder {
 
+    private final ActionOrderType type;
+
+    public ActionOrder(ActionOrderType type) {
+        this.type = type;
+    }
+
+    public ActionOrderType getType() {
+        return type;
+    }
+
     public abstract void writeTo(OutputStream stream) throws IOException;
 
     public static ActionOrder readFrom(InputStream stream) throws IOException {
@@ -34,16 +44,17 @@ public abstract class ActionOrder {
 
         private int loot;
 
+        public Pickup(int loot) {
+            super(ActionOrderType.PICKUP);
+            this.loot = loot;
+        }
+
         public int getLoot() {
             return loot;
         }
 
         public void setLoot(int value) {
             this.loot = value;
-        }
-
-        public Pickup(int loot) {
-            this.loot = loot;
         }
 
         public static Pickup readFrom(InputStream stream) throws IOException {
@@ -73,6 +84,7 @@ public abstract class ActionOrder {
         public static final int TAG = 1;
 
         public UseShieldPotion() {
+            super(ActionOrderType.USE_SHIELD_POTION);
         }
 
         public static UseShieldPotion readFrom(InputStream stream) throws IOException {
@@ -98,16 +110,17 @@ public abstract class ActionOrder {
 
         private int amount;
 
+        public DropShieldPotions(int amount) {
+            super(ActionOrderType.DROP_SHIELD_POTION);
+            this.amount = amount;
+        }
+
         public int getAmount() {
             return amount;
         }
 
         public void setAmount(int value) {
             this.amount = value;
-        }
-
-        public DropShieldPotions(int amount) {
-            this.amount = amount;
         }
 
         public static DropShieldPotions readFrom(InputStream stream) throws IOException {
@@ -137,6 +150,7 @@ public abstract class ActionOrder {
         public static final int TAG = 3;
 
         public DropWeapon() {
+            super(ActionOrderType.DROP_WEAPON);
         }
 
         public static DropWeapon readFrom(InputStream stream) throws IOException {
@@ -161,6 +175,13 @@ public abstract class ActionOrder {
         public static final int TAG = 4;
 
         private int weaponTypeIndex;
+        private int amount;
+
+        public DropAmmo(int weaponTypeIndex, int amount) {
+            super(ActionOrderType.DROP_AMMO);
+            this.weaponTypeIndex = weaponTypeIndex;
+            this.amount = amount;
+        }
 
         public int getWeaponTypeIndex() {
             return weaponTypeIndex;
@@ -170,19 +191,12 @@ public abstract class ActionOrder {
             this.weaponTypeIndex = value;
         }
 
-        private int amount;
-
         public int getAmount() {
             return amount;
         }
 
         public void setAmount(int value) {
             this.amount = value;
-        }
-
-        public DropAmmo(int weaponTypeIndex, int amount) {
-            this.weaponTypeIndex = weaponTypeIndex;
-            this.amount = amount;
         }
 
         public static DropAmmo readFrom(InputStream stream) throws IOException {
@@ -219,16 +233,17 @@ public abstract class ActionOrder {
 
         private boolean shoot;
 
+        public Aim(boolean shoot) {
+            super(ActionOrderType.AIM);
+            this.shoot = shoot;
+        }
+
         public boolean isShoot() {
             return shoot;
         }
 
         public void setShoot(boolean value) {
             this.shoot = value;
-        }
-
-        public Aim(boolean shoot) {
-            this.shoot = shoot;
         }
 
         public static Aim readFrom(InputStream stream) throws IOException {

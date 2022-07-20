@@ -31,6 +31,7 @@ public class MyStrategy implements Strategy {
 
     @Override
     public Order getOrder(Game game, DebugInterface debugInterface) {
+        System.out.println("tick: " + game.getCurrentTick());
         Map<Integer, UnitOrder> orders = new HashMap<>();
         Zone zone = game.getZone();
         for (Iterator<Sound> it = sounds.iterator(); it.hasNext();) {
@@ -125,6 +126,11 @@ public class MyStrategy implements Strategy {
                 direction = enemy.getPosition();
                 target = getTargetToEnemy(unit, enemy);
             }
+            System.out.println("enemy: " + enemy);
+            System.out.println("sound: " + sound);
+            System.out.println("target: " + target);
+            System.out.println("direction: " + direction);
+            System.out.println("action: " + action);
             if (target != null && !GeoUtil.isInsideCircle(target, game.getZone().getCurrentCenter(), game.getZone().getCurrentRadius())) {
                 target = null;
                 if (enemy == null) {
@@ -152,6 +158,9 @@ public class MyStrategy implements Strategy {
                     }
                 }
             }
+            System.out.println("target: " + target);
+            System.out.println("direction: " + direction);
+            System.out.println("action: " + action);
             orders.put(unit.getId(), new UnitOrder(
                     target != null
                             ? unit.getPosition().getVelocity(target, Game.CONSTANTS.getMaxUnitForwardSpeed())

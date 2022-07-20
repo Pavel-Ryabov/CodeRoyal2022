@@ -11,7 +11,13 @@ import xyz.pary.raic.coderoyal2022.util.StreamUtil;
 
 public class Game {
 
+    public static final double EPS = 1e-6;
+    
     public static Constants CONSTANTS;
+
+    public static int timeToTicks(double t) {
+        return (int) Math.ceil(t * CONSTANTS.getTicksPerSecond());
+    }
 
     private int myId;
     private Player[] players;

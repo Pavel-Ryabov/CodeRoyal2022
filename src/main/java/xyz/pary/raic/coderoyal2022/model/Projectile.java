@@ -25,6 +25,16 @@ public class Projectile implements Point {
         this.lifeTime = lifeTime;
     }
 
+    public Projectile(Projectile projectile) {
+        this.id = projectile.id;
+        this.weaponTypeIndex = projectile.weaponTypeIndex;
+        this.shooterId = projectile.shooterId;
+        this.shooterPlayerId = projectile.shooterPlayerId;
+        this.position = new Vec2(projectile.position);
+        this.velocity = new Vec2(projectile.velocity);
+        this.lifeTime = projectile.lifeTime;
+    }
+
     public int getId() {
         return id;
     }

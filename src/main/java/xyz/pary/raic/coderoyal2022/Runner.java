@@ -29,7 +29,7 @@ public class Runner {
     }
 
     void run() throws IOException {
-        Strategy myStrategy = new MyStrategy();
+        Strategy myStrategy = "test".equals(System.getenv("strategy")) ? new TestStrategy() : new MyStrategy();
         DebugInterface debugInterface = new DebugInterface(inputStream, outputStream);
         while (true) {
             ServerMessage message = ServerMessage.readFrom(inputStream);

@@ -8,6 +8,17 @@ import xyz.pary.raic.coderoyal2022.util.StreamUtil;
 public class Action {
 
     private int finishTick;
+    private ActionType actionType;
+
+    public Action(int finishTick, ActionType actionType) {
+        this.finishTick = finishTick;
+        this.actionType = actionType;
+    }
+
+    public Action(Action a) {
+        this.finishTick = a.finishTick;
+        this.actionType = a.actionType;
+    }
 
     public int getFinishTick() {
         return finishTick;
@@ -17,19 +28,12 @@ public class Action {
         this.finishTick = value;
     }
 
-    private ActionType actionType;
-
     public ActionType getActionType() {
         return actionType;
     }
 
     public void setActionType(ActionType value) {
         this.actionType = value;
-    }
-
-    public Action(int finishTick, ActionType actionType) {
-        this.finishTick = finishTick;
-        this.actionType = actionType;
     }
 
     public static Action readFrom(InputStream stream) throws IOException {
