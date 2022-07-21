@@ -114,4 +114,38 @@ public class GeoUtil {
         double t2 = (-b + discr) / (2 * a);
         return (t1 >= 0 && t1 <= 1) || (t2 >= 0 && t2 <= 1);
     }
+
+    public static Vec2[] getIntersectionPoints(Vec2 p1, Vec2 p2, Vec2 c, double r) {
+        Vec2 s1 = p1.sub(c);
+        Vec2 s2 = p2.sub(c);
+        Vec2 d = s2.sub(s1);
+        double cross = crossProduct(s1, s2);
+        double dSq = d.squaredLength();
+        double discr = r * r * dSq - cross * cross;
+
+        if (discr < 0) {
+            return new Vec2[0];
+        }
+
+        if (discr == 0) {
+            return new Vec2[]{new Vec2(cross * d.getY() / dSq + c.getX(), -cross * d.getX() / dSq + c.getY())};
+        }
+
+        double discSqrt = Math.sqrt(discr);
+        double sgn = 1;
+        if (d.getY() < 0) {
+            sgn = -1;
+        }
+
+        return new Vec2[]{
+            new Vec2(
+            (cross * d.getY() + sgn * d.getX() * discSqrt) / dSq + c.getX(),
+            (-cross * d.getX() + Math.abs(d.getY()) * discSqrt) / dSq + c.getY()
+            ),
+            new Vec2(
+            (cross * d.getY() - sgn * d.getX() * discSqrt) / dSq + c.getX(),
+            (-cross * d.getX() - Math.abs(d.getY()) * discSqrt) / dSq + c.getY()
+            )
+        };
+    }
 }

@@ -15,24 +15,26 @@ import xyz.pary.raic.coderoyal2022.model.Order;
 import xyz.pary.raic.coderoyal2022.model.Unit;
 import xyz.pary.raic.coderoyal2022.model.UnitOrder;
 import xyz.pary.raic.coderoyal2022.model.Vec2;
+import xyz.pary.raic.coderoyal2022.util.GeoUtil;
 
 public class TestStrategy implements Strategy {
 
     private List<Unit> res = new ArrayList<>();
 
     @Override
-    public Order getOrder(Game game, DebugInterface debugInterface) {
+    public Order getOrder(Game game, DebugInterface di) {
         System.out.println("tick: " + game.getCurrentTick());
-        System.out.println("acc t: " + (Game.CONSTANTS.getUnitAcceleration() * (1.0 / 30)));
 
         if (game.getCurrentTick() == 0) {
+            System.out.println("st pos: " + game.getMyUnits().get(0).getPosition());
             Simulator sim = new Simulator(game.getCurrentTick(), game.getMyUnits(), Arrays.asList(game.getProjectiles()));
             for (int i = 0; i < 90; i++) {
-                sim.tick();
+                sim.tick(di);
             }
             res = sim.getRes();
         }
         if (game.getCurrentTick() > 0 && game.getCurrentTick() <= res.size()) {
+            System.out.println("pos: " + game.getMyUnits().get(0).getPosition() + "  sim: " + res.get(game.getCurrentTick() - 1).getPosition());
             System.out.println("vel: " + game.getMyUnits().get(0).getVelocity() + "  sim: " + res.get(game.getCurrentTick() - 1).getVelocity());
             System.out.println("vel len: " + game.getMyUnits().get(0).getVelocity().length() + "  sim: " + res.get(game.getCurrentTick() - 1).getVelocity().length());
             System.out.println("dir: " + game.getMyUnits().get(0).getDirection() + "  sim: " + res.get(game.getCurrentTick() - 1).getDirection());
@@ -49,14 +51,22 @@ public class TestStrategy implements Strategy {
                     new ActionOrder.Aim(true)
             ));
             if (game.getCurrentTick() > 0 && game.getCurrentTick() <= res.size()) {
-                if (debugInterface != null) {
-                    debugInterface.add(new DebugData.Segment(
-                            unit.getPosition(), unit.getPosition().add(unit.getDirection().mul(20)), 0.25, new Color(1, 0, 0, 0.5))
+                Unit u = res.get(game.getCurrentTick() - 1);
+                if (di != null && u.getC() != null) {
+                    di.add(new DebugData.Segment(
+                            u.getPosition(), u.getPosition().add(u.getDirection()), 0.25, new Color(0, 0, 0, 0.5))
                     );
-                }
-                if (debugInterface != null) {
-                    debugInterface.add(new DebugData.Segment(
-                            unit.getPosition(), unit.getPosition().add(res.get(game.getCurrentTick() - 1).getDirection().mul(20)), 0.25, new Color(0, 0, 1, 0.5))
+                    di.add(new DebugData.Segment(
+                            u.getPosition(), u.getPosition().add(u.getVelocity()), 0.25, new Color(0, 1, 0, 0.5))
+                    );
+                    di.add(new DebugData.Ring(
+                            u.getC(), u.getR(), 0.1, new Color(0, 0, 0, 0.5))
+                    );
+                    di.add(new DebugData.Circle(
+                            u.getPosition(), 1, new Color(1, 0, 0, 0.5))
+                    );
+                    di.add(new DebugData.Circle(
+                            u.getIp(), 0.1, new Color(0, 0, 1, 0.5))
                     );
                 }
             }
@@ -71,20 +81,17 @@ public class TestStrategy implements Strategy {
                 forwardSpeed *= speedModifier;
                 backwardSpeed *= speedModifier;
             }
-            System.out.println("forwardSpeed: " + forwardSpeed);
-            System.out.println("backwardSpeed: " + backwardSpeed);
-            System.out.println("(forwardSpeed - backwardSpeed) / 2: " + (forwardSpeed - backwardSpeed) / 2);
             //После расчета ограничений вперед/назад, вектор целевой скорости ограничивается кругом радиуса 
             //(max_unit_forward_speed + max_unit_backward_speed) / 2. 
             //Центр круга ограничения скорости лежит по направлению зрения юнита на расстоянии 
             //(max_unit_forward_speed - max_unit_backward_speed) / 2.
-            double r = (forwardSpeed - backwardSpeed) / 2;
-            Vec2 c = unit.getDirection().mul(r);
-            if (debugInterface != null) {
-                debugInterface.add(new DebugData.Ring(
-                        unit.getPosition().add(c), r, 0.1, new Color(0, 0, 0, 1))
-                );
-            }
+//            double r = (forwardSpeed - backwardSpeed) / 2;
+//            Vec2 c = unit.getDirection().mul(r);
+//            if (debugInterface != null) {
+//                debugInterface.add(new DebugData.Ring(
+//                        unit.getPosition().add(c), r, 0.1, new Color(0, 0, 0, 1))
+//                );
+//            }
 
         }
 

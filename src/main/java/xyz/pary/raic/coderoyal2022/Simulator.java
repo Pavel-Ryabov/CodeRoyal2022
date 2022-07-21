@@ -3,6 +3,8 @@ package xyz.pary.raic.coderoyal2022;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import xyz.pary.raic.coderoyal2022.debugging.Color;
+import xyz.pary.raic.coderoyal2022.debugging.DebugData;
 import xyz.pary.raic.coderoyal2022.model.Action;
 import xyz.pary.raic.coderoyal2022.model.ActionOrder;
 import xyz.pary.raic.coderoyal2022.model.ActionOrderType;
@@ -30,7 +32,7 @@ public class Simulator {
         this.projectiles = projectiles.stream().map(p -> new Projectile(p)).collect(Collectors.toList());
     }
 
-    public void tick() {
+    public void tick(DebugInterface di) {
 //        if (tick == 0) {
 //            tick++;
 //            return;
@@ -46,9 +48,9 @@ public class Simulator {
             ));
         }
         act();
-        rotate(dt);
+        //rotate(dt);
         aim(dt);
-        move(dt);
+        move(dt, di);
         res.add(new Unit(units.get(0)));
         tick++;
     }
@@ -112,7 +114,7 @@ public class Simulator {
         }
     }
 
-    private void move(double dt) {
+    private void move(double dt, DebugInterface di) {
         for (Unit u : units) {
             Vec2 normVel = u.getUnitOrder().getTargetVelocity().normalize();
             Vec2 nextVel;
@@ -135,14 +137,41 @@ public class Simulator {
                 //Центр круга ограничения скорости лежит по направлению зрения юнита на расстоянии 
                 //(max_unit_forward_speed - max_unit_backward_speed) / 2.
                 double r = (forwardSpeed - backwardSpeed) / 2;
-                Vec2 c = u.getDirection().mul(r);
+                Vec2 c = GeoUtil.getIntersect(u.getPosition(), r, u.getPosition().add(u.getDirection()));
+
+//                Vec2 c = u.getDirection().mul(r);
                 nextVel = u.getUnitOrder().getTargetVelocity();
+                Vec2[] ips = GeoUtil.getIntersectionPoints(u.getPosition(), c, c, r);
+                if (ips.length == 1) {
+                    nextVel = ips[0].sub(u.getPosition());
+                }
+                if (ips.length == 2) {
+                    nextVel = (ips[0].squredDistanceTo(nextVel) < ips[1].squredDistanceTo(nextVel) ? ips[0] : ips[1]).sub(u.getPosition());
+//                    if (di != null) {
+//                        di.add(new DebugData.Segment(
+//                                u.getPosition(), u.getPosition().add(u.getDirection()), 0.25, new Color(0, 0, 0, 0.5))
+//                        );
+//                        di.add(new DebugData.Ring(
+//                                u.getPosition(), r, 0.1, new Color(0, 0, 0, 0.5))
+//                        );
+//                        di.add(new DebugData.Circle(
+//                                u.getPosition(), 1, new Color(1, 0, 0, 0.5))
+//                        );
+//                        di.add(new DebugData.Circle(
+//                                ips[0].squredDistanceTo(nextVel) < ips[1].squredDistanceTo(nextVel) ? ips[0] : ips[1], 0.1, new Color(0, 0, 1, 0.5))
+//                        );
+//                        di.clear();
+//                    }
+                }
+                u.setC(c);
+                u.setR(r);
+                u.setIps(ips[0].squredDistanceTo(nextVel) < ips[1].squredDistanceTo(nextVel) ? ips[0] : ips[1]);
             }
             double acc = Game.CONSTANTS.getUnitAcceleration() * dt;
             double length = nextVel.length();
             nextVel = length <= acc ? nextVel : nextVel.normalize(length).mul(acc);
-            nextVel = u.getVelocity().add(nextVel);
             u.setPosition(u.getPosition().add(nextVel));
+            nextVel = u.getVelocity().add(nextVel);
             u.setVelocity(nextVel);
 
             if (u.getRemainingSpawnTime() != null) {
