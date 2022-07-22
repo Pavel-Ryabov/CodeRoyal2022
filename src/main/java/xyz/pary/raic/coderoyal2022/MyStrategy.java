@@ -31,6 +31,7 @@ public class MyStrategy implements Strategy {
 
     @Override
     public Order getOrder(Game game, DebugInterface debugInterface) {
+//        System.out.println("tick: " + game.getCurrentTick());
         Map<Integer, UnitOrder> orders = new HashMap<>();
         Zone zone = game.getZone();
         for (Iterator<Sound> it = sounds.iterator(); it.hasNext();) {
@@ -93,7 +94,15 @@ public class MyStrategy implements Strategy {
                     }
                 }
                 if (enemy == null) {
-                    if (unit.getShieldPotions() < Game.CONSTANTS.getMaxShieldPotionsInInventory()) {
+                    Loot bow = null;
+                    if (unit.getWeapon() != WeaponType.BOW) {
+                        bow = GeoUtil.getNearestTarget(unit, game.getWeaponLoot().stream().
+                                filter(a -> a.getItem().getType() == WeaponType.BOW).collect(Collectors.toList()));
+                    }
+                    if (bow != null) {
+                        target = bow.getPosition();
+                        direction = bow.getPosition();
+                    } else if (unit.getShieldPotions() < Game.CONSTANTS.getMaxShieldPotionsInInventory()) {
                         Loot potion = GeoUtil.getNearestTarget(unit, game.getPotionLoot());
                         if (potion != null) {
                             target = potion.getPosition();
@@ -125,6 +134,11 @@ public class MyStrategy implements Strategy {
                 direction = enemy.getPosition();
                 target = getTargetToEnemy(unit, enemy);
             }
+//            System.out.println("enemy: " + enemy);
+//            System.out.println("sound: " + sound);
+//            System.out.println("target: " + target);
+//            System.out.println("direction: " + direction);
+//            System.out.println("action: " + action);
             if (target != null && !GeoUtil.isInsideCircle(target, game.getZone().getCurrentCenter(), game.getZone().getCurrentRadius())) {
                 target = null;
                 if (enemy == null) {
@@ -132,26 +146,33 @@ public class MyStrategy implements Strategy {
                 }
             }
             if (enemy != null && action instanceof ActionOrder.Aim) {
-                for (Obstacle o : Game.CONSTANTS.getObstacles()) {
-                    if (!o.isCanShootThrough() && unit.getPosition().distanceTo(o.getPosition()) < distanceToEnemy) {
-                        if (GeoUtil.isIntersect(unit.getPosition(), enemy.getPosition(), o.getPosition(), o.getRadius())) {
-                            ((ActionOrder.Aim) action).setShoot(false);
-                            if (debugInterface != null) {
-                                debugInterface.add(new DebugData.Ring(
-                                        unit.getPosition(), Game.CONSTANTS.getUnitRadius(), 0.25, new Color(0, 0, 1, 1))
-                                );
-                                debugInterface.add(new DebugData.Ring(
-                                        enemy.getPosition(), Game.CONSTANTS.getUnitRadius(), 0.25, new Color(0, 0, 1, 1))
-                                );
-                                debugInterface.add(new DebugData.Ring(
-                                        o.getPosition(), o.getRadius(), 0.25, new Color(1, 0, 0, 1))
-                                );
+                if (enemy.getRemainingSpawnTime() != null) {
+                    ((ActionOrder.Aim) action).setShoot(false);
+                } else {
+                    for (Obstacle o : Game.CONSTANTS.getObstacles()) {
+                        if (!o.isCanShootThrough() && unit.getPosition().squredDistanceTo(o.getPosition()) < distanceToEnemy * distanceToEnemy) {
+                            if (GeoUtil.isIntersect(unit.getPosition(), enemy.getPosition(), o.getPosition(), o.getRadius())) {
+                                ((ActionOrder.Aim) action).setShoot(false);
+                                if (debugInterface != null) {
+                                    debugInterface.add(new DebugData.Ring(
+                                            unit.getPosition(), Game.CONSTANTS.getUnitRadius(), 0.25, new Color(0, 0, 1, 1))
+                                    );
+                                    debugInterface.add(new DebugData.Ring(
+                                            enemy.getPosition(), Game.CONSTANTS.getUnitRadius(), 0.25, new Color(0, 0, 1, 1))
+                                    );
+                                    debugInterface.add(new DebugData.Ring(
+                                            o.getPosition(), o.getRadius(), 0.25, new Color(1, 0, 0, 1))
+                                    );
+                                }
+                                break;
                             }
-                            break;
                         }
                     }
                 }
             }
+//            System.out.println("target: " + target);
+//            System.out.println("direction: " + direction);
+//            System.out.println("action: " + action);
             orders.put(unit.getId(), new UnitOrder(
                     target != null
                             ? unit.getPosition().getVelocity(target, Game.CONSTANTS.getMaxUnitForwardSpeed())
@@ -213,7 +234,7 @@ public class MyStrategy implements Strategy {
     private double getMaxDistanceToEnemy(Unit unit) {
         if (unit.getWeapon() != null) {
             WeaponProperties wp = Game.CONSTANTS.getWeapons().get(unit.getWeapon());
-            return wp.getProjectileSpeed() * wp.getProjectileLifeTime() * 0.8;
+            return wp.getProjectileSpeed() * wp.getProjectileLifeTime() * 0.75;
         }
         return Game.CONSTANTS.getViewDistance() * 0.60;
     }
