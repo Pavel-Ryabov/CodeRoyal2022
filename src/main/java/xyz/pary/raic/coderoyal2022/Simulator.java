@@ -3,8 +3,6 @@ package xyz.pary.raic.coderoyal2022;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import xyz.pary.raic.coderoyal2022.debugging.Color;
-import xyz.pary.raic.coderoyal2022.debugging.DebugData;
 import xyz.pary.raic.coderoyal2022.model.Action;
 import xyz.pary.raic.coderoyal2022.model.ActionOrder;
 import xyz.pary.raic.coderoyal2022.model.ActionOrderType;
@@ -15,9 +13,11 @@ import xyz.pary.raic.coderoyal2022.model.Unit;
 import xyz.pary.raic.coderoyal2022.model.UnitOrder;
 import xyz.pary.raic.coderoyal2022.model.Vec2;
 import xyz.pary.raic.coderoyal2022.util.GeoUtil;
-import xyz.pary.raic.coderoyal2022.util.TrigonometryUtil;
 
 public class Simulator {
+
+    private static final double DT = 1 / Game.CONSTANTS.getTicksPerSecond();
+    private static final double ACC = Game.CONSTANTS.getUnitAcceleration() * DT;
 
     private List<Unit> res = new ArrayList<>();
 
@@ -37,10 +37,10 @@ public class Simulator {
 //            tick++;
 //            return;
 //        }
-        double dt = 1 / Game.CONSTANTS.getTicksPerSecond();
         for (Unit unit : units) {
             unit.setUnitOrder(new UnitOrder(
-                    unit.getDirection().sub(unit.getPosition()).normalize().mul(100),
+                    //unit.getDirection().sub(unit.getPosition()).normalize().mul(100),
+                    unit.getDirection().normalize().mul(100),
                     new Vec2(0, 0),
                     //unit.getDirection().mul(50).rotate(-20, true),
                     //new Vec2(unit.getDirection().getY(), -unit.getDirection().getX()),
@@ -49,8 +49,8 @@ public class Simulator {
         }
         act();
         //rotate(dt);
-        aim(dt);
-        move(dt, di);
+        aim();
+        move(di);
         res.add(new Unit(units.get(0)));
         tick++;
     }
@@ -73,7 +73,7 @@ public class Simulator {
         }
     }
 
-    private void rotate(double dt) {
+    private void rotate() {
         for (Unit u : units) {
             if (u.getUnitOrder() != null && u.getUnitOrder().getTargetDirection() != null) {
                 double rotationSpeed = Game.CONSTANTS.getRotationSpeed();
@@ -85,7 +85,7 @@ public class Simulator {
                         rotationSpeed = aimRotationSpeed;
                     }
                 }
-                rotationSpeed *= dt;
+                rotationSpeed *= DT;
                 Vec2 dir = u.getDirection();
                 Vec2 tDir = u.getUnitOrder().getTargetDirection();
                 double angle = Math.toDegrees(Math.atan2(GeoUtil.crossProduct(dir, tDir), GeoUtil.dotProduct(dir, tDir)));
@@ -94,7 +94,7 @@ public class Simulator {
         }
     }
 
-    private void aim(double dt) {
+    private void aim() {
         for (Unit u : units) {
             if (u.getRemainingSpawnTime() != null || u.getWeapon() == null || u.getAction() != null) {
                 continue;
@@ -102,10 +102,10 @@ public class Simulator {
             if (u.getUnitOrder() == null
                     || u.getUnitOrder().getAction() == null
                     || u.getUnitOrder().getAction().getType() != ActionOrderType.AIM) {
-                double aimTime = u.getAim() - 1 / u.getWeaponProperties().getAimTime() * dt;
+                double aimTime = u.getAim() - 1 / u.getWeaponProperties().getAimTime() * DT;
                 u.setAim(aimTime - Game.EPS <= 0 ? 0 : aimTime);
             } else if (u.getAim() < 1) {
-                double aimTime = u.getAim() + 1 / u.getWeaponProperties().getAimTime() * dt;
+                double aimTime = u.getAim() + 1 / u.getWeaponProperties().getAimTime() * DT;
                 u.setAim(aimTime + Game.EPS >= 1 ? 1 : aimTime);
             }
             if (u.getAim() == 1 && u.getNextShotTick() <= tick && ((ActionOrder.Aim) u.getUnitOrder().getAction()).isShoot()) {
@@ -114,12 +114,18 @@ public class Simulator {
         }
     }
 
-    private void move(double dt, DebugInterface di) {
+    private void move(DebugInterface di) {
         for (Unit u : units) {
-            Vec2 normVel = u.getUnitOrder().getTargetVelocity().normalize();
-            Vec2 nextVel;
+            Vec2 targetVel = u.getUnitOrder().getTargetVelocity();
+            Vec2 nextVel = targetVel;
             if (u.getRemainingSpawnTime() != null) {
-                nextVel = normVel.mul(Game.CONSTANTS.getSpawnMovementSpeed());
+                //nextVel = normVel.mul(Game.CONSTANTS.getSpawnMovementSpeed());
+                double length = targetVel.length();
+                nextVel = u.getVelocity().add(length <= ACC ? targetVel : targetVel.normalize(length).mul(ACC));
+                length = nextVel.length();
+                if (length > Game.CONSTANTS.getSpawnMovementSpeed()) {
+                    nextVel.normalize(length).mul(Game.CONSTANTS.getSpawnMovementSpeed());
+                }
             } else {
                 double forwardSpeed = Game.CONSTANTS.getMaxUnitForwardSpeed();
                 double backwardSpeed = Game.CONSTANTS.getMaxUnitBackwardSpeed();
@@ -136,17 +142,23 @@ public class Simulator {
                 //(max_unit_forward_speed + max_unit_backward_speed) / 2. 
                 //Центр круга ограничения скорости лежит по направлению зрения юнита на расстоянии 
                 //(max_unit_forward_speed - max_unit_backward_speed) / 2.
-                double r = (forwardSpeed - backwardSpeed) / 2;
-                Vec2 c = GeoUtil.getIntersect(u.getPosition(), r, u.getPosition().add(u.getDirection()));
+                //v0 + a * t
+                double r = (forwardSpeed + backwardSpeed) / 2;
+                double d = (forwardSpeed - backwardSpeed) / 2;
+                Vec2 c = GeoUtil.getIntersect(u.getPosition(), d, u.getPosition().add(u.getDirection()));
 
-//                Vec2 c = u.getDirection().mul(r);
-                nextVel = u.getUnitOrder().getTargetVelocity();
+//                Vec2 c = u.getDirection().mul(d);
                 Vec2[] ips = GeoUtil.getIntersectionPoints(u.getPosition(), c, c, r);
-                if (ips.length == 1) {
-                    nextVel = ips[0].sub(u.getPosition());
-                }
+                double length = targetVel.length();
+                nextVel = u.getVelocity().add(length <= ACC ? targetVel : targetVel.normalize(length).mul(ACC));
+                length = nextVel.length();
                 if (ips.length == 2) {
-                    nextVel = (ips[0].squredDistanceTo(nextVel) < ips[1].squredDistanceTo(nextVel) ? ips[0] : ips[1]).sub(u.getPosition());
+                    Vec2 rv = (ips[0].squredDistanceTo(nextVel) < ips[1].squredDistanceTo(nextVel) ? ips[0] : ips[1])
+                            .sub(u.getPosition()).normalize().mul(r);
+                    double rvLength = rv.length();
+                    double rv1Length = ips[0].sub(u.getPosition()).normalize().mul(r).length();
+                    double rv2Length = ips[1].sub(u.getPosition()).normalize().mul(r).length();
+                     nextVel = rv.length() < length ? rv : nextVel;
 //                    if (di != null) {
 //                        di.add(new DebugData.Segment(
 //                                u.getPosition(), u.getPosition().add(u.getDirection()), 0.25, new Color(0, 0, 0, 0.5))
@@ -167,15 +179,13 @@ public class Simulator {
                 u.setR(r);
                 u.setIps(ips[0].squredDistanceTo(nextVel) < ips[1].squredDistanceTo(nextVel) ? ips[0] : ips[1]);
             }
-            double acc = Game.CONSTANTS.getUnitAcceleration() * dt;
-            double length = nextVel.length();
-            nextVel = length <= acc ? nextVel : nextVel.normalize(length).mul(acc);
-            u.setPosition(u.getPosition().add(nextVel));
-            nextVel = u.getVelocity().add(nextVel);
+//            double length = nextVel.length();
+//            nextVel = u.getVelocity().add(length <= ACC ? nextVel : nextVel.normalize(length).mul(ACC));
+            u.setPosition(u.getPosition().add(nextVel.mul(DT)));
             u.setVelocity(nextVel);
 
             if (u.getRemainingSpawnTime() != null) {
-                double respTime = u.getRemainingSpawnTime() - dt;
+                double respTime = u.getRemainingSpawnTime() - DT;
                 u.setRemainingSpawnTime(respTime - Game.EPS <= 0 ? null : respTime);
             }
         }

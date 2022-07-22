@@ -44,7 +44,8 @@ public class TestStrategy implements Strategy {
         Map<Integer, UnitOrder> orders = new HashMap<>();
         for (Unit unit : game.getMyUnits()) {
             orders.put(unit.getId(), new UnitOrder(
-                    unit.getDirection().sub(unit.getPosition()).normalize().mul(100),
+                    //unit.getDirection().sub(unit.getPosition()).normalize().mul(100),
+                    unit.getDirection().normalize().mul(100),
                     new Vec2(0, 0),
                     //unit.getDirection().mul(50).rotate(-20, true),
                     //new Vec2(unit.getDirection().getY(), -unit.getDirection().getX()),
@@ -58,6 +59,9 @@ public class TestStrategy implements Strategy {
                     );
                     di.add(new DebugData.Segment(
                             u.getPosition(), u.getPosition().add(u.getVelocity()), 0.25, new Color(0, 1, 0, 0.5))
+                    );
+                    di.add(new DebugData.Segment(
+                            unit.getPosition(), unit.getPosition().add(unit.getVelocity()), 0.25, new Color(0, 0, 1, 0.5))
                     );
                     di.add(new DebugData.Ring(
                             u.getC(), u.getR(), 0.1, new Color(0, 0, 0, 0.5))
