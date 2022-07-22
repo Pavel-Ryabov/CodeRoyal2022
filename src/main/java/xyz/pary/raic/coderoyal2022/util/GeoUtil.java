@@ -148,4 +148,34 @@ public class GeoUtil {
             )
         };
     }
+
+    public static boolean isIntersect(Vec2 c1, double r1, Vec2 c2, double r2) {
+        return squaredDistance(c1, c2) <= (r1 + r2) * (r1 + r2);
+    }
+
+    public static boolean isIntersect(Vec2 c11, Vec2 c12, double r1, Vec2 c21, Vec2 c22) {
+        return isIntersect(c11.getX(), c11.getY(), c12.getX(), c12.getY(), r1, c21.getX(), c21.getY(), c22.getX(), c22.getY(), 0);
+    }
+
+    public static boolean isIntersect(double x11, double y11, double x12, double y12, double r1,
+            double x21, double y21, double x22, double y22, double r2) {
+        double a = x11 * x11 + x12 * x12 + y11 * y11 + y12 * y12 + x21 * x21 + x22 * x22 + y21 * y21 + y22 * y22
+                + 2 * (-x11 * x12 - x21 * x22 - y11 * y12 - y21 * y22 - x11 * x21 - y11 * y21 + x11 * x22 + y11 * y22
+                + x12 * x21 + y12 * y21 - x12 * x22 - y12 * y22);
+        double b = 2 * (-x11 * x11 - x21 * x21 - y11 * y11 - y21 * y21
+                + x11 * x12 + y11 * y12 + x21 * x22 + y21 * y22 - x11 * x22 - y11 * y22 - x12 * x21 - y12 * y21 + 2 * x11 * x21 + 2 * y11 * y21);
+        double c = x11 * x11 - 2 * x11 * x21 + x21 * x21 + y11 * y11 - 2 * y11 * y21 + y21 * y21 - (r1 + r2) * (r1 + r2);
+        double d = b * b - 4 * a * c;
+        if (a != 0 && d >= 0) {
+            if (d == 0) {
+                double t = (-b) / 2 * a;
+                return t >= 0 && t <= 1;
+            }
+            double sqrt = Math.sqrt(d);
+            double t1 = (-b + sqrt) / 2 * a;
+            double t2 = (-b - sqrt) / 2 * a;
+            return (t1 >= 0 && t1 <= 1) || (t2 >= 0 && t2 <= 1);
+        }
+        return false;
+    }
 }

@@ -11,6 +11,7 @@ import xyz.pary.raic.coderoyal2022.debugging.Color;
 import xyz.pary.raic.coderoyal2022.debugging.DebugData;
 import xyz.pary.raic.coderoyal2022.model.ActionOrder;
 import xyz.pary.raic.coderoyal2022.model.Game;
+import xyz.pary.raic.coderoyal2022.model.Obstacle;
 import xyz.pary.raic.coderoyal2022.model.Order;
 import xyz.pary.raic.coderoyal2022.model.Unit;
 import xyz.pary.raic.coderoyal2022.model.UnitOrder;
@@ -33,6 +34,11 @@ public class TestStrategy implements Strategy {
             }
             res = sim.getRes();
         }
+        for (Obstacle o : Game.CONSTANTS.getObstacles()) {
+            di.add(new DebugData.Ring(
+                    o.getPosition(), o.getRadius(), 0.25, new Color(1, 0, 0, 1))
+            );
+        }
         if (game.getCurrentTick() > 0 && game.getCurrentTick() <= res.size()) {
             System.out.println("pos: " + game.getMyUnits().get(0).getPosition() + "  sim: " + res.get(game.getCurrentTick() - 1).getPosition());
             System.out.println("vel: " + game.getMyUnits().get(0).getVelocity() + "  sim: " + res.get(game.getCurrentTick() - 1).getVelocity());
@@ -49,11 +55,12 @@ public class TestStrategy implements Strategy {
                     new Vec2(0, 0),
                     //unit.getDirection().mul(50).rotate(-20, true),
                     //new Vec2(unit.getDirection().getY(), -unit.getDirection().getX()),
-                    new ActionOrder.Aim(true)
+                    //                    new ActionOrder.Aim(true)
+                    null
             ));
             if (game.getCurrentTick() > 0 && game.getCurrentTick() <= res.size()) {
                 Unit u = res.get(game.getCurrentTick() - 1);
-                if (di != null && u.getC() != null) {
+                if (di != null) {
                     di.add(new DebugData.Segment(
                             u.getPosition(), u.getPosition().add(u.getDirection()), 0.25, new Color(0, 0, 0, 0.5))
                     );
@@ -63,14 +70,8 @@ public class TestStrategy implements Strategy {
                     di.add(new DebugData.Segment(
                             unit.getPosition(), unit.getPosition().add(unit.getVelocity()), 0.25, new Color(0, 0, 1, 0.5))
                     );
-                    di.add(new DebugData.Ring(
-                            u.getC(), u.getR(), 0.1, new Color(0, 0, 0, 0.5))
-                    );
                     di.add(new DebugData.Circle(
                             u.getPosition(), 1, new Color(1, 0, 0, 0.5))
-                    );
-                    di.add(new DebugData.Circle(
-                            u.getIp(), 0.1, new Color(0, 0, 1, 0.5))
                     );
                 }
             }

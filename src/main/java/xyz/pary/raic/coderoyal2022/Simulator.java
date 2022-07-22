@@ -1,13 +1,17 @@
 package xyz.pary.raic.coderoyal2022;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
+import xyz.pary.raic.coderoyal2022.debugging.Color;
+import xyz.pary.raic.coderoyal2022.debugging.DebugData;
 import xyz.pary.raic.coderoyal2022.model.Action;
 import xyz.pary.raic.coderoyal2022.model.ActionOrder;
 import xyz.pary.raic.coderoyal2022.model.ActionOrderType;
 import xyz.pary.raic.coderoyal2022.model.ActionType;
 import xyz.pary.raic.coderoyal2022.model.Game;
+import xyz.pary.raic.coderoyal2022.model.Obstacle;
 import xyz.pary.raic.coderoyal2022.model.Projectile;
 import xyz.pary.raic.coderoyal2022.model.Unit;
 import xyz.pary.raic.coderoyal2022.model.UnitOrder;
@@ -18,6 +22,7 @@ public class Simulator {
 
     private static final double DT = 1 / Game.CONSTANTS.getTicksPerSecond();
     private static final double ACC = Game.CONSTANTS.getUnitAcceleration() * DT;
+    private static final double HALF_UNIT_RADIUS = Game.CONSTANTS.getUnitRadius() / 2;
 
     private List<Unit> res = new ArrayList<>();
 
@@ -44,11 +49,12 @@ public class Simulator {
                     new Vec2(0, 0),
                     //unit.getDirection().mul(50).rotate(-20, true),
                     //new Vec2(unit.getDirection().getY(), -unit.getDirection().getX()),
-                    new ActionOrder.Aim(true)
+                    //new ActionOrder.Aim(true)
+                    null
             ));
         }
         act();
-        //rotate(dt);
+        rotate();
         aim();
         move(di);
         res.add(new Unit(units.get(0)));
@@ -75,7 +81,8 @@ public class Simulator {
 
     private void rotate() {
         for (Unit u : units) {
-            if (u.getUnitOrder() != null && u.getUnitOrder().getTargetDirection() != null) {
+            if (u.getUnitOrder() != null && u.getUnitOrder().getTargetDirection() != null
+                    && u.getUnitOrder().getTargetDirection().squaredLength() >= HALF_UNIT_RADIUS * HALF_UNIT_RADIUS) {
                 double rotationSpeed = Game.CONSTANTS.getRotationSpeed();
                 if (u.getWeapon() != null) {
                     double aimRotationSpeed = u.getWeaponProperties().getAimRotationSpeed();
@@ -116,8 +123,11 @@ public class Simulator {
 
     private void move(DebugInterface di) {
         for (Unit u : units) {
+            if (u.isIntersectsWithObstacle()) {
+                continue;
+            }
             Vec2 targetVel = u.getUnitOrder().getTargetVelocity();
-            Vec2 nextVel = targetVel;
+            Vec2 nextVel;
             if (u.getRemainingSpawnTime() != null) {
                 //nextVel = normVel.mul(Game.CONSTANTS.getSpawnMovementSpeed());
                 double length = targetVel.length();
@@ -142,48 +152,82 @@ public class Simulator {
                 //(max_unit_forward_speed + max_unit_backward_speed) / 2. 
                 //Центр круга ограничения скорости лежит по направлению зрения юнита на расстоянии 
                 //(max_unit_forward_speed - max_unit_backward_speed) / 2.
-                //v0 + a * t
+                //v = v0 + at
+                //s = v0t + (at2 / 2)
                 double r = (forwardSpeed + backwardSpeed) / 2;
                 double d = (forwardSpeed - backwardSpeed) / 2;
                 Vec2 c = GeoUtil.getIntersect(u.getPosition(), d, u.getPosition().add(u.getDirection()));
-
-//                Vec2 c = u.getDirection().mul(d);
-                Vec2[] ips = GeoUtil.getIntersectionPoints(u.getPosition(), c, c, r);
+                Vec2[] ips = GeoUtil.getIntersectionPoints(u.getPosition(), u.getPosition().add(targetVel), c, r);
                 double length = targetVel.length();
                 nextVel = u.getVelocity().add(length <= ACC ? targetVel : targetVel.normalize(length).mul(ACC));
                 length = nextVel.length();
                 if (ips.length == 2) {
-                    Vec2 rv = (ips[0].squredDistanceTo(nextVel) < ips[1].squredDistanceTo(nextVel) ? ips[0] : ips[1])
-                            .sub(u.getPosition()).normalize().mul(r);
+                    Vec2 rv = (ips[0].sub(u.getPosition()).squredDistanceTo(nextVel)
+                            < ips[1].sub(u.getPosition()).squredDistanceTo(nextVel) ? ips[0] : ips[1])
+                            .sub(u.getPosition());
                     double rvLength = rv.length();
                     double rv1Length = ips[0].sub(u.getPosition()).normalize().mul(r).length();
                     double rv2Length = ips[1].sub(u.getPosition()).normalize().mul(r).length();
-                     nextVel = rv.length() < length ? rv : nextVel;
-//                    if (di != null) {
-//                        di.add(new DebugData.Segment(
-//                                u.getPosition(), u.getPosition().add(u.getDirection()), 0.25, new Color(0, 0, 0, 0.5))
-//                        );
-//                        di.add(new DebugData.Ring(
-//                                u.getPosition(), r, 0.1, new Color(0, 0, 0, 0.5))
-//                        );
-//                        di.add(new DebugData.Circle(
-//                                u.getPosition(), 1, new Color(1, 0, 0, 0.5))
-//                        );
-//                        di.add(new DebugData.Circle(
-//                                ips[0].squredDistanceTo(nextVel) < ips[1].squredDistanceTo(nextVel) ? ips[0] : ips[1], 0.1, new Color(0, 0, 1, 0.5))
-//                        );
-//                        di.clear();
-//                    }
+                    double d1Length = ips[0].squredDistanceTo(nextVel);
+                    double d2Length = ips[1].squredDistanceTo(nextVel);
+                    nextVel = rv.length() < length + Game.EPS ? rv : nextVel;
+                    if (di != null) {
+                        di.add(new DebugData.Segment(
+                                u.getPosition(), u.getPosition().add(nextVel), 0.25, new Color(0, 0, 0, 0.5))
+                        );
+                        di.add(new DebugData.Ring(
+                                c, r, 0.1, new Color(0, 0, 0, 0.5))
+                        );
+                        di.add(new DebugData.Circle(
+                                u.getPosition(), 1, new Color(1, 0, 0, 0.5))
+                        );
+                        di.add(new DebugData.Circle(
+                                (ips[0].squredDistanceTo(nextVel) < ips[1].squredDistanceTo(nextVel) ? ips[0] : ips[1]).sub(u.getPosition()), 0.1, new Color(0, 0, 1, 0.5))
+                        );
+                        di.add(new DebugData.Circle(
+                                ips[0], 0.25, new Color(1, 0, 0, 0.5))
+                        );
+                        di.add(new DebugData.Circle(
+                                ips[1], 0.25, new Color(1, 0, 0, 0.5))
+                        );
+                        di.clear();
+                    }
                 }
-                u.setC(c);
-                u.setR(r);
-                u.setIps(ips[0].squredDistanceTo(nextVel) < ips[1].squredDistanceTo(nextVel) ? ips[0] : ips[1]);
             }
-//            double length = nextVel.length();
-//            nextVel = u.getVelocity().add(length <= ACC ? nextVel : nextVel.normalize(length).mul(ACC));
+            u.setPrevPosition(u.getPosition());
             u.setPosition(u.getPosition().add(nextVel.mul(DT)));
             u.setVelocity(nextVel);
 
+        }
+        List<Unit> utc = new ArrayList<>(units);
+        for (Obstacle o : Game.CONSTANTS.getObstacles()) {
+            for (Iterator<Unit> it = utc.iterator(); it.hasNext();) {
+                Unit u = it.next();
+                if (u.getRemainingSpawnTime() != null) {
+                    it.remove();
+                } else if (GeoUtil.isIntersect(u.getPosition(), Game.CONSTANTS.getUnitRadius(), o.getPosition(), o.getRadius())) {
+                    u.setIntersectsWithObstacle(true);
+                    it.remove();
+                }
+            }
+            if (utc.isEmpty()) {
+                break;
+            }
+        }
+        for (Unit u : units) {
+            if (u.getRemainingSpawnTime() != null) {
+                double respTime = u.getRemainingSpawnTime() - DT;
+                u.setRemainingSpawnTime(respTime - Game.EPS <= 0 ? null : respTime);
+            }
+        }
+    }
+    
+    public void projectiles() {
+        for (Iterator<Projectile> it = projectiles.iterator(); it.hasNext();) {
+            Projectile p = it.next();
+            
+        }
+        for (Unit u : units) {
             if (u.getRemainingSpawnTime() != null) {
                 double respTime = u.getRemainingSpawnTime() - DT;
                 u.setRemainingSpawnTime(respTime - Game.EPS <= 0 ? null : respTime);

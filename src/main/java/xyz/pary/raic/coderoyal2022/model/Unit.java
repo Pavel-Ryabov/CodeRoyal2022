@@ -31,9 +31,8 @@ public class Unit implements Point {
     private List<Projectile> projectiles;
     private UnitOrder unitOrder;
 
-    private Vec2 c;
-    private double r;
-    private Vec2 ip;
+    private Vec2 prevPosition;
+    private boolean intersectsWithObstacle;
 
     public Unit(int id, int playerId, double health, double shield, int extraLives, Vec2 position, Double remainingSpawnTime,
             Vec2 velocity, Vec2 direction, double aim, Action action, int healthRegenerationStartTick, WeaponType weapon,
@@ -73,10 +72,6 @@ public class Unit implements Point {
         this.nextShotTick = unit.nextShotTick;
         this.ammo = unit.ammo.clone();
         this.shieldPotions = unit.shieldPotions;
-
-        this.c = unit.c;
-        this.r = unit.r;
-        this.ip = unit.ip;
     }
 
     public int getId() {
@@ -249,6 +244,22 @@ public class Unit implements Point {
         return Game.CONSTANTS.getWeapons().get(this.getWeapon());
     }
 
+    public Vec2 getPrevPosition() {
+        return prevPosition;
+    }
+
+    public void setPrevPosition(Vec2 prevPosition) {
+        this.prevPosition = prevPosition;
+    }
+
+    public boolean isIntersectsWithObstacle() {
+        return intersectsWithObstacle;
+    }
+
+    public void setIntersectsWithObstacle(boolean intersectsWithObstacle) {
+        this.intersectsWithObstacle = intersectsWithObstacle;
+    }
+
     @Override
     public double getX() {
         return position.getX();
@@ -267,30 +278,6 @@ public class Unit implements Point {
     @Override
     public void setY(double value) {
         position.setY(value);
-    }
-
-    public Vec2 getC() {
-        return c;
-    }
-
-    public void setC(Vec2 c) {
-        this.c = c;
-    }
-
-    public double getR() {
-        return r;
-    }
-
-    public void setR(double r) {
-        this.r = r;
-    }
-
-    public Vec2 getIp() {
-        return ip;
-    }
-
-    public void setIps(Vec2 ip) {
-        this.ip = ip;
     }
 
     public static Unit readFrom(InputStream stream) throws IOException {
