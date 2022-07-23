@@ -1,8 +1,10 @@
 package xyz.pary.raic.coderoyal2022;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import xyz.pary.raic.coderoyal2022.debugging.Color;
 import xyz.pary.raic.coderoyal2022.debugging.DebugData;
@@ -24,7 +26,7 @@ public class Simulator {
     private static final double ACC = Game.CONSTANTS.getUnitAcceleration() * DT;
     private static final double HALF_UNIT_RADIUS = Game.CONSTANTS.getUnitRadius() / 2;
 
-    private List<Unit> res = new ArrayList<>();
+    private Map<Integer, Unit> res = new HashMap<>();
 
     private final List<Unit> units;
     private final List<Projectile> projectiles;
@@ -46,9 +48,10 @@ public class Simulator {
             unit.setUnitOrder(new UnitOrder(
                     //unit.getDirection().sub(unit.getPosition()).normalize().mul(100),
                     unit.getDirection().normalize().mul(100),
-                    new Vec2(0, 0),
+                    //                    unit.getDirection().rotate(180).mul(20),
+                    //new Vec2(0, 0),
                     //unit.getDirection().mul(50).rotate(-20, true),
-                    //new Vec2(unit.getDirection().getY(), -unit.getDirection().getX()),
+                    new Vec2(unit.getDirection().getY(), -unit.getDirection().getX()),
                     //new ActionOrder.Aim(true)
                     null
             ));
@@ -57,7 +60,8 @@ public class Simulator {
         rotate();
         aim();
         move(di);
-        res.add(new Unit(units.get(0)));
+        projectiles(di);
+        res.put(tick, new Unit(units.get(0)));
         tick++;
     }
 
@@ -129,7 +133,6 @@ public class Simulator {
             Vec2 targetVel = u.getUnitOrder().getTargetVelocity();
             Vec2 nextVel;
             if (u.getRemainingSpawnTime() != null) {
-                //nextVel = normVel.mul(Game.CONSTANTS.getSpawnMovementSpeed());
                 double length = targetVel.length();
                 nextVel = u.getVelocity().add(length <= ACC ? targetVel : targetVel.normalize(length).mul(ACC));
                 length = nextVel.length();
@@ -165,33 +168,7 @@ public class Simulator {
                     Vec2 rv = (ips[0].sub(u.getPosition()).squredDistanceTo(nextVel)
                             < ips[1].sub(u.getPosition()).squredDistanceTo(nextVel) ? ips[0] : ips[1])
                             .sub(u.getPosition());
-                    double rvLength = rv.length();
-                    double rv1Length = ips[0].sub(u.getPosition()).normalize().mul(r).length();
-                    double rv2Length = ips[1].sub(u.getPosition()).normalize().mul(r).length();
-                    double d1Length = ips[0].squredDistanceTo(nextVel);
-                    double d2Length = ips[1].squredDistanceTo(nextVel);
                     nextVel = rv.length() < length + Game.EPS ? rv : nextVel;
-                    if (di != null) {
-                        di.add(new DebugData.Segment(
-                                u.getPosition(), u.getPosition().add(nextVel), 0.25, new Color(0, 0, 0, 0.5))
-                        );
-                        di.add(new DebugData.Ring(
-                                c, r, 0.1, new Color(0, 0, 0, 0.5))
-                        );
-                        di.add(new DebugData.Circle(
-                                u.getPosition(), 1, new Color(1, 0, 0, 0.5))
-                        );
-                        di.add(new DebugData.Circle(
-                                (ips[0].squredDistanceTo(nextVel) < ips[1].squredDistanceTo(nextVel) ? ips[0] : ips[1]).sub(u.getPosition()), 0.1, new Color(0, 0, 1, 0.5))
-                        );
-                        di.add(new DebugData.Circle(
-                                ips[0], 0.25, new Color(1, 0, 0, 0.5))
-                        );
-                        di.add(new DebugData.Circle(
-                                ips[1], 0.25, new Color(1, 0, 0, 0.5))
-                        );
-                        di.clear();
-                    }
                 }
             }
             u.setPrevPosition(u.getPosition());
@@ -221,21 +198,59 @@ public class Simulator {
             }
         }
     }
-    
-    public void projectiles() {
+
+    private void projectiles(DebugInterface di) {
         for (Iterator<Projectile> it = projectiles.iterator(); it.hasNext();) {
             Projectile p = it.next();
-            
-        }
-        for (Unit u : units) {
-            if (u.getRemainingSpawnTime() != null) {
-                double respTime = u.getRemainingSpawnTime() - DT;
-                u.setRemainingSpawnTime(respTime - Game.EPS <= 0 ? null : respTime);
+            Vec2 nextPos = p.getPosition().add(p.getVelocity().mul(DT));
+            if (checkIntersection(p, nextPos, di)) {
+                it.remove();
+            } else {
+                p.setLifeTime(p.getLifeTime() - DT);
+                if (p.getLifeTime() - Game.EPS <= 0) {
+                    it.remove();
+                } else {
+                    p.setPosition(nextPos);
+                }
             }
         }
     }
 
-    public List<Unit> getRes() {
+    private boolean checkIntersection(Projectile p, Vec2 nextPos, DebugInterface di) {
+        for (Unit u : units) {
+            di.add(new DebugData.Circle(
+                    u.getPrevPosition(), 1, new Color(0, 1, 0, 0.5))
+            );
+            di.add(new DebugData.Circle(
+                    u.getPosition(), 1, new Color(1, 0, 0, 0.5))
+            );
+            di.add(new DebugData.Circle(
+                    p.getPosition(), 0.25, new Color(0, 0, 1, 0.5))
+            );
+            di.add(new DebugData.Circle(
+                    nextPos, 0.25, new Color(0, 0, 0, 0.5))
+            );
+            di.clear();
+            if (GeoUtil.isIntersect(u.getPrevPosition(), u.getPosition(), Game.CONSTANTS.getUnitRadius(), p.getPosition(), nextPos)) {
+                u.setShield(u.getShield() - Game.CONSTANTS.getWeapons().get(p.getWeaponType()).getProjectileDamage());
+                if (u.getShield() < 0) {
+                    u.setHealth(u.getHealth() + u.getShield());
+                    u.setShield(0);
+                }
+                return true;
+            }
+            for (Obstacle o : Game.CONSTANTS.getObstacles()) {
+                if (!o.isCanShootThrough() && p.getPosition().squredDistanceTo(o.getPosition()) < p.getPosition().squredDistanceTo(u.getPosition())) {
+                    if (GeoUtil.isIntersect(p.getPosition(), u.getPosition(), o.getPosition(), o.getRadius())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public Map<Integer, Unit> getRes() {
         return res;
     }
 
