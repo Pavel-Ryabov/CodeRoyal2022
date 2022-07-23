@@ -51,7 +51,20 @@ public class MyStrategy implements Strategy {
             if (enemy != null) {
                 distanceToEnemy = unit.getPosition().distanceTo(enemy.getPosition());
             }
-            if (unit.getShield() == 0 && unit.getShieldPotions() > 0) {
+            if (unit.getWeapon() == null) {
+                Loot weapon = GeoUtil.getNearestTarget(unit, game.getWeaponLoot().stream().
+                        filter(a -> a.getItem().getType() == WeaponType.BOW).collect(Collectors.toList()));
+                if (weapon == null) {
+                    weapon = GeoUtil.getNearestTarget(unit, game.getWeaponLoot());
+                }
+                if (weapon != null) {
+                    target = weapon.getPosition();
+                    direction = weapon.getPosition();
+                    if (unit.getPosition().distanceTo(weapon.getPosition()) <= Game.CONSTANTS.getUnitRadius()) {
+                        action = new ActionOrder.Pickup(weapon.getId());
+                    }
+                }
+            } else if (unit.getShield() == 0 && unit.getShieldPotions() > 0) {
                 action = new ActionOrder.UseShieldPotion();
             } else if (unit.getAmmo().get(unit.getWeapon()) == 0) {
                 Loot ammo = GeoUtil.getNearestTarget(unit, game.getAmmoLoot().stream().
