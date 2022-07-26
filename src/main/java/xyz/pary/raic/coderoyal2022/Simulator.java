@@ -1,13 +1,9 @@
 package xyz.pary.raic.coderoyal2022;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
-import xyz.pary.raic.coderoyal2022.debugging.Color;
-import xyz.pary.raic.coderoyal2022.debugging.DebugData;
 import xyz.pary.raic.coderoyal2022.model.Action;
 import xyz.pary.raic.coderoyal2022.model.ActionOrder;
 import xyz.pary.raic.coderoyal2022.model.ActionOrderType;
@@ -16,7 +12,6 @@ import xyz.pary.raic.coderoyal2022.model.Game;
 import xyz.pary.raic.coderoyal2022.model.Obstacle;
 import xyz.pary.raic.coderoyal2022.model.Projectile;
 import xyz.pary.raic.coderoyal2022.model.Unit;
-import xyz.pary.raic.coderoyal2022.model.UnitOrder;
 import xyz.pary.raic.coderoyal2022.model.Vec2;
 import xyz.pary.raic.coderoyal2022.util.GeoUtil;
 
@@ -25,8 +20,6 @@ public class Simulator {
     private static final double DT = 1 / Game.CONSTANTS.getTicksPerSecond();
     private static final double ACC = Game.CONSTANTS.getUnitAcceleration() * DT;
     private static final double HALF_UNIT_RADIUS = Game.CONSTANTS.getUnitRadius() / 2;
-
-    private Map<Integer, Unit> res = new HashMap<>();
 
     private final List<Unit> units;
     private final List<Projectile> projectiles;
@@ -39,29 +32,12 @@ public class Simulator {
         this.projectiles = projectiles.stream().map(p -> new Projectile(p)).collect(Collectors.toList());
     }
 
-    public void tick(DebugInterface di) {
-//        if (tick == 0) {
-//            tick++;
-//            return;
-//        }
-        for (Unit unit : units) {
-            unit.setUnitOrder(new UnitOrder(
-                    //unit.getDirection().sub(unit.getPosition()).normalize().mul(100),
-                    unit.getDirection().normalize().mul(100),
-                    //                    unit.getDirection().rotate(180).mul(20),
-                    //new Vec2(0, 0),
-                    //unit.getDirection().mul(50).rotate(-20, true),
-                    new Vec2(unit.getDirection().getY(), -unit.getDirection().getX()),
-                    //new ActionOrder.Aim(true)
-                    null
-            ));
-        }
+    public void tick() {
         act();
         rotate();
         aim();
-        move(di);
-        projectiles(di);
-        res.put(tick, new Unit(units.get(0)));
+        move();
+        projectiles();
         tick++;
     }
 
@@ -125,7 +101,7 @@ public class Simulator {
         }
     }
 
-    private void move(DebugInterface di) {
+    private void move() {
         for (Unit u : units) {
             if (u.isIntersectsWithObstacle()) {
                 continue;
@@ -160,9 +136,11 @@ public class Simulator {
                 double r = (forwardSpeed + backwardSpeed) / 2;
                 double d = (forwardSpeed - backwardSpeed) / 2;
                 Vec2 c = GeoUtil.getIntersect(u.getPosition(), d, u.getPosition().add(u.getDirection()));
-                Vec2[] ips = GeoUtil.getIntersectionPoints(u.getPosition(), u.getPosition().add(targetVel), c, r);
-                double length = targetVel.length();
-                nextVel = u.getVelocity().add(length <= ACC ? targetVel : targetVel.normalize(length).mul(ACC));
+//                Vec2 c = u.getPosition().add(u.getDirection().mul(d));
+                double length = targetVel.sub(u.getVelocity()).length();
+                nextVel = u.getVelocity().add(length <= ACC ? targetVel.sub(u.getVelocity()) : targetVel.sub(u.getVelocity()).normalize(length).mul(ACC));
+//                nextVel = u.getVelocity().add(targetVel.sub(u.getVelocity()));
+                Vec2[] ips = GeoUtil.getIntersectionPoints(u.getPosition(), u.getPosition().add(nextVel), c, r);
                 length = nextVel.length();
                 if (ips.length == 2) {
                     Vec2 rv = (ips[0].sub(u.getPosition()).squredDistanceTo(nextVel)
@@ -170,6 +148,9 @@ public class Simulator {
                             .sub(u.getPosition());
                     nextVel = rv.length() < length + Game.EPS ? rv : nextVel;
                 }
+                u.setC(c);
+                u.setR(r);
+                u.setIps(ips);
             }
             u.setPrevPosition(u.getPosition());
             u.setPosition(u.getPosition().add(nextVel.mul(DT)));
@@ -199,11 +180,11 @@ public class Simulator {
         }
     }
 
-    private void projectiles(DebugInterface di) {
+    private void projectiles() {
         for (Iterator<Projectile> it = projectiles.iterator(); it.hasNext();) {
             Projectile p = it.next();
             Vec2 nextPos = p.getPosition().add(p.getVelocity().mul(DT));
-            if (checkIntersection(p, nextPos, di)) {
+            if (checkIntersection(p, nextPos)) {
                 it.remove();
             } else {
                 p.setLifeTime(p.getLifeTime() - DT);
@@ -216,21 +197,8 @@ public class Simulator {
         }
     }
 
-    private boolean checkIntersection(Projectile p, Vec2 nextPos, DebugInterface di) {
+    private boolean checkIntersection(Projectile p, Vec2 nextPos) {
         for (Unit u : units) {
-            di.add(new DebugData.Circle(
-                    u.getPrevPosition(), 1, new Color(0, 1, 0, 0.5))
-            );
-            di.add(new DebugData.Circle(
-                    u.getPosition(), 1, new Color(1, 0, 0, 0.5))
-            );
-            di.add(new DebugData.Circle(
-                    p.getPosition(), 0.25, new Color(0, 0, 1, 0.5))
-            );
-            di.add(new DebugData.Circle(
-                    nextPos, 0.25, new Color(0, 0, 0, 0.5))
-            );
-            di.clear();
             if (GeoUtil.isIntersect(u.getPrevPosition(), u.getPosition(), Game.CONSTANTS.getUnitRadius(), p.getPosition(), nextPos)) {
                 u.setShield(u.getShield() - Game.CONSTANTS.getWeapons().get(p.getWeaponType()).getProjectileDamage());
                 if (u.getShield() < 0) {
@@ -240,7 +208,8 @@ public class Simulator {
                 return true;
             }
             for (Obstacle o : Game.CONSTANTS.getObstacles()) {
-                if (!o.isCanShootThrough() && p.getPosition().squredDistanceTo(o.getPosition()) < p.getPosition().squredDistanceTo(u.getPosition())) {
+                if (!o.isCanShootThrough() && p.getPosition().squredDistanceTo(o.getPosition())
+                        < p.getPosition().squredDistanceTo(u.getPosition())) {
                     if (GeoUtil.isIntersect(p.getPosition(), u.getPosition(), o.getPosition(), o.getRadius())) {
                         return true;
                     }
@@ -250,8 +219,12 @@ public class Simulator {
         return false;
     }
 
-    public Map<Integer, Unit> getRes() {
-        return res;
+    public int getTick() {
+        return tick;
+    }
+
+    public List<Unit> getUnits() {
+        return units;
     }
 
 }
