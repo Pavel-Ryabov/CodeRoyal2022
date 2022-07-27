@@ -107,10 +107,11 @@ public class Simulator {
                 continue;
             }
             Vec2 targetVel = u.getUnitOrder().getTargetVelocity();
-            Vec2 nextVel;
+            Vec2 dv = targetVel.sub(u.getVelocity());
+            Vec2 nextVel = dv;
             if (u.getRemainingSpawnTime() != null) {
-                double length = targetVel.length();
-                nextVel = u.getVelocity().add(length <= ACC ? targetVel : targetVel.normalize(length).mul(ACC));
+                double length = nextVel.length();
+                nextVel = u.getVelocity().add(length <= ACC ? nextVel : nextVel.normalize(length).mul(ACC));
                 length = nextVel.length();
                 if (length > Game.CONSTANTS.getSpawnMovementSpeed()) {
                     nextVel.normalize(length).mul(Game.CONSTANTS.getSpawnMovementSpeed());
@@ -137,15 +138,15 @@ public class Simulator {
                 double d = (forwardSpeed - backwardSpeed) / 2;
                 Vec2 c = GeoUtil.getIntersect(u.getPosition(), d, u.getPosition().add(u.getDirection()));
 //                Vec2 c = u.getPosition().add(u.getDirection().mul(d));
-                double length = targetVel.sub(u.getVelocity()).length();
-                nextVel = u.getVelocity().add(length <= ACC ? targetVel.sub(u.getVelocity()) : targetVel.sub(u.getVelocity()).normalize(length).mul(ACC));
+                double length = nextVel.length();
+                nextVel = u.getVelocity().add(length <= ACC ? nextVel : nextVel.normalize(length).mul(ACC));
 //                nextVel = u.getVelocity().add(targetVel.sub(u.getVelocity()));
                 Vec2[] ips = GeoUtil.getIntersectionPoints(u.getPosition(), u.getPosition().add(nextVel), c, r);
                 length = nextVel.length();
                 if (ips.length == 2) {
-                    Vec2 rv = (ips[0].sub(u.getPosition()).squredDistanceTo(nextVel)
-                            < ips[1].sub(u.getPosition()).squredDistanceTo(nextVel) ? ips[0] : ips[1])
-                            .sub(u.getPosition());
+                    Vec2 rv = (ips[0].sub(u.getVelocity()).squredDistanceTo(nextVel)
+                            < ips[1].sub(u.getVelocity()).squredDistanceTo(nextVel) ? ips[0] : ips[1])
+                            .sub(u.getVelocity());
                     nextVel = rv.length() < length + Game.EPS ? rv : nextVel;
                 }
                 u.setC(c);
@@ -153,7 +154,9 @@ public class Simulator {
                 u.setIps(ips);
             }
             u.setPrevPosition(u.getPosition());
-            u.setPosition(u.getPosition().add(nextVel.mul(DT)));
+            u.setPosition(u.getPosition().add(
+                    nextVel.mul(1.0 / Math.sqrt((dv.getX() * dv.getX() + dv.getY() * dv.getY())))
+            ));
             u.setVelocity(nextVel);
 
         }
