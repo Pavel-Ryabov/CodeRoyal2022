@@ -17,7 +17,7 @@ import xyz.pary.raic.coderoyal2022.util.GeoUtil;
 
 public class Simulator {
 
-    private static final double DT = 1 / Game.CONSTANTS.getTicksPerSecond();
+    private static final double DT = 1.0 / Game.CONSTANTS.getTicksPerSecond();
     private static final double ACC = Game.CONSTANTS.getUnitAcceleration() * DT;
     private static final double HALF_UNIT_RADIUS = Game.CONSTANTS.getUnitRadius() / 2;
 
@@ -136,27 +136,21 @@ public class Simulator {
                 //s = v0t + (at2 / 2)
                 double r = (forwardSpeed + backwardSpeed) / 2;
                 double d = (forwardSpeed - backwardSpeed) / 2;
-                Vec2 c = GeoUtil.getIntersect(u.getPosition(), d, u.getPosition().add(u.getDirection()));
-//                Vec2 c = u.getPosition().add(u.getDirection().mul(d));
-                double length = nextVel.length();
-                nextVel = u.getVelocity().add(length <= ACC ? nextVel : nextVel.normalize(length).mul(ACC));
-//                nextVel = u.getVelocity().add(targetVel.sub(u.getVelocity()));
-                Vec2[] ips = GeoUtil.getIntersectionPoints(u.getPosition(), u.getPosition().add(nextVel), c, r);
-                length = nextVel.length();
+//                    Vec2 c = GeoUtil.getIntersectionPoint(u.getPosition(), d, u.getPosition().add(u.getDirection()));
+                Vec2 c = u.getPosition().add(u.getDirection().mul(d));
+                Vec2[] ips = GeoUtil.getIntersectionPoints(u.getPosition(), u.getPosition().add(targetVel), c, r);
                 if (ips.length == 2) {
-                    Vec2 rv = (ips[0].sub(u.getVelocity()).squredDistanceTo(nextVel)
-                            < ips[1].sub(u.getVelocity()).squredDistanceTo(nextVel) ? ips[0] : ips[1])
-                            .sub(u.getVelocity());
-                    nextVel = rv.length() < length + Game.EPS ? rv : nextVel;
+                    Vec2 rv = (ips[0].squredDistanceTo(u.getPosition().add(targetVel)) < ips[1].squredDistanceTo(u.getPosition().add(targetVel))
+                            ? ips[0] : ips[1])
+                            .sub(u.getPosition()).sub(u.getVelocity());;
+                    nextVel = u.getVelocity().add(rv.length() <= ACC ? rv : rv.normalize().mul(ACC));
                 }
                 u.setC(c);
                 u.setR(r);
                 u.setIps(ips);
             }
             u.setPrevPosition(u.getPosition());
-            u.setPosition(u.getPosition().add(
-                    nextVel.mul(1.0 / Math.sqrt((dv.getX() * dv.getX() + dv.getY() * dv.getY())))
-            ));
+            u.setPosition(u.getPosition().add(nextVel.mul(DT)));
             u.setVelocity(nextVel);
 
         }
