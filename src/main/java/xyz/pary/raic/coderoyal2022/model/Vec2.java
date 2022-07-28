@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import static java.lang.StrictMath.sqrt;
 import xyz.pary.raic.coderoyal2022.util.StreamUtil;
 import xyz.pary.raic.coderoyal2022.util.GeoUtil;
+import xyz.pary.raic.coderoyal2022.util.TrigonometryUtil;
 
 public class Vec2 implements Point {
 
@@ -18,6 +19,11 @@ public class Vec2 implements Point {
     public Vec2(double x, double y) {
         this.x = x;
         this.y = y;
+    }
+
+    public Vec2(Vec2 v) {
+        this.x = v.x;
+        this.y = v.y;
     }
 
     @Override
@@ -63,6 +69,10 @@ public class Vec2 implements Point {
      */
     public Vec2 normalize() {
         double length = this.length();
+        return normalize(length);
+    }
+
+    public Vec2 normalize(double length) {
         if (length != 0) {
             return new Vec2(this.x / length, this.y / length);
         }
@@ -144,6 +154,22 @@ public class Vec2 implements Point {
         double dx = x * COS15 - y * SIN15;
         double dy = x * SIN15 + y * COS15;
         return new Vec2(dx, dy);
+    }
+
+    public Vec2 rotate(double degrees, boolean ccw) {
+        double r = Math.toRadians(degrees);
+        if (!ccw) {
+            r = -r;
+        }
+        double sin = TrigonometryUtil.sin(r);
+        double cos = TrigonometryUtil.cos(r);
+        double dx = x * cos - y * sin;
+        double dy = x * sin + y * cos;
+        return new Vec2(dx, dy);
+    }
+
+    public Vec2 rotate(double degrees) {
+        return rotate(degrees, true);
     }
 
     public static Vec2 readFrom(InputStream stream) throws IOException {

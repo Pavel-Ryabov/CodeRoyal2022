@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.Set;
 import xyz.pary.raic.coderoyal2022.util.StreamUtil;
 
 public class Constants {
@@ -46,7 +48,7 @@ public class Constants {
     private EnumMap<SoundType, SoundProperties> sounds;
     private SoundType stepsSoundType;
     private double stepsSoundTravelDistance;
-    private Obstacle[] obstacles;
+    private Set<Obstacle> obstacles;
 
     public Constants(double ticksPerSecond, int teamSize, double initialZoneRadius, double zoneSpeed, double zoneDamagePerSecond,
             double spawnTime, double spawnCollisionDamagePerSecond, double lootingTime, int botPlayers, double unitRadius,
@@ -56,7 +58,7 @@ public class Constants {
             double maxUnitBackwardSpeed, double unitAcceleration, boolean friendlyFire, double killScore,
             double damageScoreMultiplier, double scorePerPlace, EnumMap<WeaponType, WeaponProperties> weapons, WeaponType startingWeapon,
             int startingWeaponAmmo, int maxShieldPotionsInInventory, double shieldPerPotion, double shieldPotionUseTime,
-            EnumMap<SoundType, SoundProperties> sounds, SoundType stepsSoundType, double stepsSoundTravelDistance, Obstacle[] obstacles) {
+            EnumMap<SoundType, SoundProperties> sounds, SoundType stepsSoundType, double stepsSoundTravelDistance, Set<Obstacle> obstacles) {
         this.ticksPerSecond = ticksPerSecond;
         this.teamSize = teamSize;
         this.initialZoneRadius = initialZoneRadius;
@@ -402,11 +404,11 @@ public class Constants {
         this.stepsSoundTravelDistance = stepsSoundTravelDistance;
     }
 
-    public Obstacle[] getObstacles() {
+    public Set<Obstacle> getObstacles() {
         return obstacles;
     }
 
-    public void setObstacles(Obstacle[] obstacles) {
+    public void setObstacles(Set<Obstacle> obstacles) {
         this.obstacles = obstacles;
     }
 
@@ -503,12 +505,11 @@ public class Constants {
         }
         double stepsSoundTravelDistance;
         stepsSoundTravelDistance = StreamUtil.readDouble(stream);
-        Obstacle[] obstacles;
-        obstacles = new Obstacle[StreamUtil.readInt(stream)];
-        for (int obstaclesIndex = 0; obstaclesIndex < obstacles.length; obstaclesIndex++) {
-            Obstacle obstaclesElement;
-            obstaclesElement = Obstacle.readFrom(stream);
-            obstacles[obstaclesIndex] = obstaclesElement;
+        int obstacleCount = StreamUtil.readInt(stream);
+        Set<Obstacle> obstacles = new HashSet<>((int) Math.ceil(obstacleCount / 0.75));
+        for (int obstaclesIndex = 0; obstaclesIndex < obstacleCount; obstaclesIndex++) {
+            Obstacle obstaclesElement = Obstacle.readFrom(stream);
+            obstacles.add(obstaclesElement);
         }
         return new Constants(ticksPerSecond, teamSize, initialZoneRadius, zoneSpeed, zoneDamagePerSecond, spawnTime,
                 spawnCollisionDamagePerSecond, lootingTime, botPlayers, unitRadius, unitHealth, healthRegenerationPerSecond,
@@ -574,7 +575,7 @@ public class Constants {
             StreamUtil.writeInt(stream, stepsSoundType.getIndex());
         }
         StreamUtil.writeDouble(stream, stepsSoundTravelDistance);
-        StreamUtil.writeInt(stream, obstacles.length);
+        StreamUtil.writeInt(stream, obstacles.size());
         for (Obstacle obstaclesElement : obstacles) {
             obstaclesElement.writeTo(stream);
         }
@@ -715,13 +716,7 @@ public class Constants {
         stringBuilder.append(", ");
         stringBuilder.append("obstacles: ");
         stringBuilder.append("[ ");
-        for (int obstaclesIndex = 0; obstaclesIndex < obstacles.length; obstaclesIndex++) {
-            if (obstaclesIndex != 0) {
-                stringBuilder.append(", ");
-            }
-            Obstacle obstaclesElement = obstacles[obstaclesIndex];
-            stringBuilder.append(String.valueOf(obstaclesElement));
-        }
+        stringBuilder.append(String.valueOf(obstacles));
         stringBuilder.append(" ]");
         stringBuilder.append(" }");
         return stringBuilder.toString();

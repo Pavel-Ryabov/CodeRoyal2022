@@ -25,6 +25,10 @@ public class GeoUtil {
         return x1 * y2 - y1 * x2;
     }
 
+    public static double crossProduct(Point p1, Point p2) {
+        return crossProduct(p1.getX(), p1.getY(), p2.getX(), p2.getY());
+    }
+
     public static double dotProduct(double x1, double y1, double x2, double y2) {
         return x1 * x2 + y1 * y2;
     }
@@ -66,7 +70,7 @@ public class GeoUtil {
         return isInsideCircle(sc.getX(), sc.getY(), rs, bc.getX(), bc.getY(), rb);
     }
 
-    public static Vec2 getIntersect(Vec2 circle, double radius, Vec2 outerPoint) {
+    public static Vec2 getIntersectionPoint(Vec2 circle, double radius, Vec2 outerPoint) {
         return circle.add(circle.getVelocity(outerPoint, radius));
     }
 
@@ -109,5 +113,69 @@ public class GeoUtil {
         double t1 = (-b - discr) / (2 * a);
         double t2 = (-b + discr) / (2 * a);
         return (t1 >= 0 && t1 <= 1) || (t2 >= 0 && t2 <= 1);
+    }
+
+    public static Vec2[] getIntersectionPoints(Vec2 p1, Vec2 p2, Vec2 c, double r) {
+        Vec2 s1 = p1.sub(c);
+        Vec2 s2 = p2.sub(c);
+        Vec2 d = s2.sub(s1);
+        double cross = crossProduct(s1, s2);
+        double dSq = d.squaredLength();
+        double discr = r * r * dSq - cross * cross;
+
+        if (discr < 0) {
+            return new Vec2[0];
+        }
+
+        if (discr == 0) {
+            return new Vec2[]{new Vec2(cross * d.getY() / dSq + c.getX(), -cross * d.getX() / dSq + c.getY())};
+        }
+
+        double discSqrt = Math.sqrt(discr);
+        double sgn = 1;
+        if (d.getY() < 0) {
+            sgn = -1;
+        }
+
+        return new Vec2[]{
+            new Vec2(
+            (cross * d.getY() + sgn * d.getX() * discSqrt) / dSq + c.getX(),
+            (-cross * d.getX() + Math.abs(d.getY()) * discSqrt) / dSq + c.getY()
+            ),
+            new Vec2(
+            (cross * d.getY() - sgn * d.getX() * discSqrt) / dSq + c.getX(),
+            (-cross * d.getX() - Math.abs(d.getY()) * discSqrt) / dSq + c.getY()
+            )
+        };
+    }
+
+    public static boolean isIntersect(Vec2 c1, double r1, Vec2 c2, double r2) {
+        return squaredDistance(c1, c2) <= (r1 + r2) * (r1 + r2);
+    }
+
+    public static boolean isIntersect(Vec2 c11, Vec2 c12, double r1, Vec2 c21, Vec2 c22) {
+        return isIntersect(c11.getX(), c11.getY(), c12.getX(), c12.getY(), r1, c21.getX(), c21.getY(), c22.getX(), c22.getY(), 0);
+    }
+
+    public static boolean isIntersect(double x11, double y11, double x12, double y12, double r1,
+            double x21, double y21, double x22, double y22, double r2) {
+        double a = x11 * x11 + x12 * x12 + y11 * y11 + y12 * y12 + x21 * x21 + x22 * x22 + y21 * y21 + y22 * y22
+                + 2 * (-x11 * x12 - x21 * x22 - y11 * y12 - y21 * y22 - x11 * x21 - y11 * y21 + x11 * x22 + y11 * y22
+                + x12 * x21 + y12 * y21 - x12 * x22 - y12 * y22);
+        double b = 2 * (-x11 * x11 - x21 * x21 - y11 * y11 - y21 * y21
+                + x11 * x12 + y11 * y12 + x21 * x22 + y21 * y22 - x11 * x22 - y11 * y22 - x12 * x21 - y12 * y21 + 2 * x11 * x21 + 2 * y11 * y21);
+        double c = x11 * x11 - 2 * x11 * x21 + x21 * x21 + y11 * y11 - 2 * y11 * y21 + y21 * y21 - (r1 + r2) * (r1 + r2);
+        double d = b * b - 4 * a * c;
+        if (a != 0 && d >= 0) {
+            if (d == 0) {
+                double t = (-b) / 2 * a;
+                return t >= 0 && t <= 1;
+            }
+            double sqrt = Math.sqrt(d);
+            double t1 = (-b + sqrt) / 2 * a;
+            double t2 = (-b - sqrt) / 2 * a;
+            return (t1 >= 0 && t1 <= 1) || (t2 >= 0 && t2 <= 1);
+        }
+        return false;
     }
 }

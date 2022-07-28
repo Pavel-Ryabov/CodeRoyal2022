@@ -29,6 +29,14 @@ public class Unit implements Point {
     private int shieldPotions;
     private List<Loot> loot;
     private List<Projectile> projectiles;
+    private UnitOrder unitOrder;
+
+    private Vec2 prevPosition;
+    private boolean intersectsWithObstacle;
+    
+    private Vec2 c ;
+    private double r;
+    private Vec2[] ips;
 
     public Unit(int id, int playerId, double health, double shield, int extraLives, Vec2 position, Double remainingSpawnTime,
             Vec2 velocity, Vec2 direction, double aim, Action action, int healthRegenerationStartTick, WeaponType weapon,
@@ -50,6 +58,57 @@ public class Unit implements Point {
         this.ammo = ammo;
         this.shieldPotions = shieldPotions;
     }
+
+    public Unit(Unit unit) {
+        this.id = unit.id;
+        this.playerId = unit.playerId;
+        this.health = unit.health;
+        this.shield = unit.shield;
+        this.extraLives = unit.extraLives;
+        this.position = new Vec2(unit.position);
+        this.remainingSpawnTime = unit.remainingSpawnTime;
+        this.velocity = new Vec2(unit.velocity);
+        this.direction = unit.direction;
+        this.aim = unit.aim;
+        this.action = unit.action != null ? new Action(unit.action) : null;
+        this.healthRegenerationStartTick = unit.healthRegenerationStartTick;
+        this.weapon = unit.weapon;
+        this.nextShotTick = unit.nextShotTick;
+        this.ammo = unit.ammo.clone();
+        this.shieldPotions = unit.shieldPotions;
+        this.unitOrder = unit.unitOrder;
+        this.prevPosition = unit.prevPosition;
+        
+        this.c = unit.c;
+        this.r = unit.r;
+        this.ips = unit.ips;
+    }
+
+    public Vec2 getC() {
+        return c;
+    }
+
+    public void setC(Vec2 c) {
+        this.c = c;
+    }
+
+    public double getR() {
+        return r;
+    }
+
+    public void setR(double r) {
+        this.r = r;
+    }
+
+    public Vec2[] getIps() {
+        return ips;
+    }
+
+    public void setIps(Vec2[] ips) {
+        this.ips = ips;
+    }
+    
+    
 
     public int getId() {
         return id;
@@ -207,6 +266,34 @@ public class Unit implements Point {
             this.projectiles = new ArrayList<>();
         }
         this.projectiles.add(projectile);
+    }
+
+    public UnitOrder getUnitOrder() {
+        return unitOrder;
+    }
+
+    public void setUnitOrder(UnitOrder unitOrder) {
+        this.unitOrder = unitOrder;
+    }
+
+    public WeaponProperties getWeaponProperties() {
+        return Game.CONSTANTS.getWeapons().get(this.getWeapon());
+    }
+
+    public Vec2 getPrevPosition() {
+        return prevPosition;
+    }
+
+    public void setPrevPosition(Vec2 prevPosition) {
+        this.prevPosition = prevPosition;
+    }
+
+    public boolean isIntersectsWithObstacle() {
+        return intersectsWithObstacle;
+    }
+
+    public void setIntersectsWithObstacle(boolean intersectsWithObstacle) {
+        this.intersectsWithObstacle = intersectsWithObstacle;
     }
 
     @Override

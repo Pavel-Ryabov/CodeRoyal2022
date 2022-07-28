@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import xyz.pary.raic.coderoyal2022.util.GeoUtil;
@@ -11,7 +12,13 @@ import xyz.pary.raic.coderoyal2022.util.StreamUtil;
 
 public class Game {
 
+    public static final double EPS = 1e-6;
+
     public static Constants CONSTANTS;
+
+    public static int timeToTicks(double t) {
+        return (int) Math.ceil(t * CONSTANTS.getTicksPerSecond());
+    }
 
     private int myId;
     private Player[] players;
@@ -183,6 +190,14 @@ public class Game {
         }
         Zone zone;
         zone = Zone.readFrom(stream);
+        for (Iterator<Obstacle> it = Game.CONSTANTS.getObstacles().iterator(); it.hasNext();) {
+            Obstacle o = it.next();
+            if (GeoUtil.squaredDistance(o.getPosition(), zone.getCurrentCenter())
+                    //(o.getRadius() + zone.getCurrentRadius()) * (o.getRadius() + zone.getCurrentRadius())) {
+                    > zone.getCurrentRadius() * zone.getCurrentRadius()) {
+                it.remove();
+            }
+        }
         int soundCount = StreamUtil.readInt(stream);
         List<Sound> sounds = new ArrayList<>(soundCount);
         for (int soundsIndex = 0; soundsIndex < soundCount; soundsIndex++) {

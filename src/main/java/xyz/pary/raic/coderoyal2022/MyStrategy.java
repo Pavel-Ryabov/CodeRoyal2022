@@ -205,15 +205,15 @@ public class MyStrategy implements Strategy {
                         enemy.getPosition(), getMaxDistanceToEnemy(unit), 0.25, new Color(0, 1, 0, 1))
                 );
 //                debugInterface.add(new DebugData.Segment(
-//                        enemy.getPosition(), GeoUtil.getIntersect(enemy.getPosition(),
+//                        enemy.getPosition(), GeoUtil.getIntersectionPoint(enemy.getPosition(),
 //                        getMaxDistanceToEnemy(unit), unit.getPosition()), 0.25, new Color(0, 1, 0, 1))
 //                );
 //                debugInterface.add(new DebugData.Segment(
-//                        enemy.getPosition(), GeoUtil.getIntersect(enemy.getPosition(),
+//                        enemy.getPosition(), GeoUtil.getIntersectionPoint(enemy.getPosition(),
 //                        getMaxDistanceToEnemy(unit), unit.getPosition().sub(enemy.getPosition()).normalize().mul(getMaxDistanceToEnemy(unit)).rotate15()),
 //                        0.25, new Color(1, 0, 0, 1))
 //                );
-                Vec2 intersectionPoint = GeoUtil.getIntersect(enemy.getPosition(), getMaxDistanceToEnemy(unit), unit.getPosition());
+                Vec2 intersectionPoint = GeoUtil.getIntersectionPoint(enemy.getPosition(), getMaxDistanceToEnemy(unit), unit.getPosition());
                 debugInterface.add(new DebugData.Segment(enemy.getPosition(), intersectionPoint, 0.1, new Color(0, 1, 0, 1)));
                 debugInterface.add(new DebugData.Segment(enemy.getPosition(), intersectionPoint.sub(enemy.getPosition()).rotate15().add(enemy.getPosition()), 0.1, new Color(1, 0, 0, 1)));
             }
@@ -240,7 +240,7 @@ public class MyStrategy implements Strategy {
     }
 
     private Vec2 getTargetToEnemy(Unit unit, Unit enemy) {
-        Vec2 intersectionPoint = GeoUtil.getIntersect(enemy.getPosition(), getMaxDistanceToEnemy(unit), unit.getPosition());
+        Vec2 intersectionPoint = GeoUtil.getIntersectionPoint(enemy.getPosition(), getMaxDistanceToEnemy(unit), unit.getPosition());
         return intersectionPoint.sub(enemy.getPosition()).rotate15().add(enemy.getPosition());
     }
 

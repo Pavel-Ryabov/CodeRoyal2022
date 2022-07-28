@@ -8,7 +8,7 @@ import xyz.pary.raic.coderoyal2022.util.StreamUtil;
 public class Projectile implements Point {
 
     private int id;
-    private int weaponTypeIndex;
+    private WeaponType weaponType;
     private int shooterId;
     private int shooterPlayerId;
     private Vec2 position;
@@ -17,12 +17,22 @@ public class Projectile implements Point {
 
     public Projectile(int id, int weaponTypeIndex, int shooterId, int shooterPlayerId, Vec2 position, Vec2 velocity, double lifeTime) {
         this.id = id;
-        this.weaponTypeIndex = weaponTypeIndex;
+        this.weaponType = WeaponType.getByIndex(weaponTypeIndex);
         this.shooterId = shooterId;
         this.shooterPlayerId = shooterPlayerId;
         this.position = position;
         this.velocity = velocity;
         this.lifeTime = lifeTime;
+    }
+
+    public Projectile(Projectile projectile) {
+        this.id = projectile.id;
+        this.weaponType = projectile.weaponType;
+        this.shooterId = projectile.shooterId;
+        this.shooterPlayerId = projectile.shooterPlayerId;
+        this.position = new Vec2(projectile.position);
+        this.velocity = new Vec2(projectile.velocity);
+        this.lifeTime = projectile.lifeTime;
     }
 
     public int getId() {
@@ -33,12 +43,12 @@ public class Projectile implements Point {
         this.id = value;
     }
 
-    public int getWeaponTypeIndex() {
-        return weaponTypeIndex;
+    public WeaponType getWeaponType() {
+        return weaponType;
     }
 
-    public void setWeaponTypeIndex(int value) {
-        this.weaponTypeIndex = value;
+    public void setWeaponType(WeaponType value) {
+        this.weaponType = value;
     }
 
     public int getShooterId() {
@@ -121,7 +131,7 @@ public class Projectile implements Point {
 
     public void writeTo(OutputStream stream) throws IOException {
         StreamUtil.writeInt(stream, id);
-        StreamUtil.writeInt(stream, weaponTypeIndex);
+        StreamUtil.writeInt(stream, weaponType.getIndex());
         StreamUtil.writeInt(stream, shooterId);
         StreamUtil.writeInt(stream, shooterPlayerId);
         position.writeTo(stream);
@@ -136,7 +146,7 @@ public class Projectile implements Point {
         stringBuilder.append(String.valueOf(id));
         stringBuilder.append(", ");
         stringBuilder.append("weaponTypeIndex: ");
-        stringBuilder.append(String.valueOf(weaponTypeIndex));
+        stringBuilder.append(String.valueOf(weaponType));
         stringBuilder.append(", ");
         stringBuilder.append("shooterId: ");
         stringBuilder.append(String.valueOf(shooterId));
