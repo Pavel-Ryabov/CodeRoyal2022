@@ -157,6 +157,9 @@ public class Vec2 implements Point {
     }
 
     public Vec2 rotate(double degrees, boolean ccw) {
+        if (degrees == 360) {
+            return this;
+        }
         double r = Math.toRadians(degrees);
         if (!ccw) {
             r = -r;

@@ -24,23 +24,29 @@ public class TestStrategy implements Strategy {
     private Map<Integer, UnitOrder> actions = new HashMap<>();
     private Map<Integer, Vec2> positions = new HashMap<>();
 
+    private final DebugInterface di;
+
+    public TestStrategy(DebugInterface di) {
+        this.di = di;
+    }
+
     @Override
-    public Order getOrder(Game game, DebugInterface di) {
+    public Order getOrder(Game game) {
         System.out.println("tick: " + game.getCurrentTick());
 
         if (game.getCurrentTick() == 0) {
             System.out.println("st pos: " + game.getMyUnits().get(0).getPosition());
-            Simulator sim = new Simulator(game.getCurrentTick(), game.getMyUnits(), Arrays.asList(game.getProjectiles()));
+            Simulator sim = new Simulator(game.getCurrentTick(), game.getMyUnits().get(0), game.getProjectiles());
             for (int i = 0; i < 200; i++) {
-                Unit u = sim.getUnits().get(0);
+                Unit u = sim.getUnit();
                 u.setUnitOrder(new UnitOrder(
                         u.getDirection().sub(u.getPosition()),
                         //                        new Vec2(0, 0),
-                        new Vec2(sim.getUnits().get(0).getDirection().getY(), -sim.getUnits().get(0).getDirection().getX()),
+                        new Vec2(sim.getUnit().getDirection().getY(), -sim.getUnit().getDirection().getX()),
                         //                        null
                         new ActionOrder.Aim(true)
                 ));
-                res.put(sim.getTick(), new Unit(sim.getUnits().get(0)));
+                res.put(sim.getTick(), new Unit(sim.getUnit()));
                 sim.tick();
 
             }
@@ -70,24 +76,24 @@ public class TestStrategy implements Strategy {
                 if (positions.get(game.getCurrentTick() - 1) != null && u.getPrevPosition() != null) {
                     System.out.println("dp: " + unit.getPosition().sub(positions.get(game.getCurrentTick() - 1)) + "  sim: " + u.getPosition().sub(u.getPrevPosition()));
                 }
-                if (di != null) {
-                    if (u.getC() != null) {
-                        di.add(new DebugData.Ring(
-                                u.getC(), u.getR(), 0.25, new Color(0, 1, 0, 1))
-                        );
-                        di.add(new DebugData.Circle(
-                                u.getC(), 0.25, new Color(0, 1, 0, 0.5))
-                        );
-                        di.add(new DebugData.Circle(
-                                u.getIps()[0], 0.2, new Color(0, 0, 0, 0.5))
-                        );
-                        di.add(new DebugData.Circle(
-                                u.getIps()[1], 0.2, new Color(0, 0, 0, 0.5))
-                        );
-                        di.add(new DebugData.Segment(
-                                u.getIps()[0], u.getIps()[1], 0.1, new Color(0, 1, 0, 0.5))
-                        );
-                    }
+                if (di.isAvailable()) {
+//                    if (u.getC() != null) {
+//                        di.add(new DebugData.Ring(
+//                                u.getC(), u.getR(), 0.25, new Color(0, 1, 0, 1))
+//                        );
+//                        di.add(new DebugData.Circle(
+//                                u.getC(), 0.25, new Color(0, 1, 0, 0.5))
+//                        );
+//                        di.add(new DebugData.Circle(
+//                                u.getIps()[0], 0.2, new Color(0, 0, 0, 0.5))
+//                        );
+//                        di.add(new DebugData.Circle(
+//                                u.getIps()[1], 0.2, new Color(0, 0, 0, 0.5))
+//                        );
+//                        di.add(new DebugData.Segment(
+//                                u.getIps()[0], u.getIps()[1], 0.1, new Color(0, 1, 0, 0.5))
+//                        );
+//                    }
                     if (u.getPrevPosition() != null) {
                         di.add(new DebugData.Segment(
                                 u.getPrevPosition(), u.getPrevPosition().add(u.getUnitOrder().getTargetVelocity()), 0.1, new Color(0, 0, 1, 0.5))

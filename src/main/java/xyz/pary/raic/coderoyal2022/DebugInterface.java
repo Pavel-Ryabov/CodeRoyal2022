@@ -17,9 +17,19 @@ public class DebugInterface {
     private final InputStream inputStream;
     private final OutputStream outputStream;
 
+    private boolean available;
+
     public DebugInterface(InputStream inputStream, OutputStream outputStream) {
         this.inputStream = inputStream;
         this.outputStream = outputStream;
+    }
+
+    public boolean isAvailable() {
+        return available;
+    }
+
+    public void setAvailable(boolean available) {
+        this.available = available;
     }
 
     public void addPlacedText(Vec2 position, String text, Vec2 alignment, double size, Color color) {
@@ -91,11 +101,13 @@ public class DebugInterface {
     }
 
     public void send(DebugCommand command) {
-        try {
-            new DebugMessage(command).writeTo(outputStream);
-            outputStream.flush();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (available) {
+            try {
+                new DebugMessage(command).writeTo(outputStream);
+                outputStream.flush();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

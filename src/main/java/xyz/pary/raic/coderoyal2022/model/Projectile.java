@@ -15,6 +15,8 @@ public class Projectile implements Point {
     private Vec2 velocity;
     private double lifeTime;
 
+    private int tick;
+
     public Projectile(int id, int weaponTypeIndex, int shooterId, int shooterPlayerId, Vec2 position, Vec2 velocity, double lifeTime) {
         this.id = id;
         this.weaponType = WeaponType.getByIndex(weaponTypeIndex);
@@ -23,6 +25,7 @@ public class Projectile implements Point {
         this.position = position;
         this.velocity = velocity;
         this.lifeTime = lifeTime;
+        this.tick = tick;
     }
 
     public Projectile(Projectile projectile) {
@@ -33,6 +36,7 @@ public class Projectile implements Point {
         this.position = new Vec2(projectile.position);
         this.velocity = new Vec2(projectile.velocity);
         this.lifeTime = projectile.lifeTime;
+        this.tick = projectile.tick;
     }
 
     public int getId() {
@@ -89,6 +93,14 @@ public class Projectile implements Point {
 
     public void setLifeTime(double value) {
         this.lifeTime = value;
+    }
+
+    public int getTick() {
+        return tick;
+    }
+
+    public void setTick(int tick) {
+        this.tick = tick;
     }
 
     @Override

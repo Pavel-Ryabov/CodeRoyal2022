@@ -33,11 +33,12 @@ public class Unit implements Point {
 
     private Vec2 prevPosition;
     private boolean intersectsWithObstacle;
-    
-    private Vec2 c ;
-    private double r;
-    private Vec2[] ips;
 
+    private boolean outsideZone;
+
+//    private Vec2 c ;
+//    private double r;
+//    private Vec2[] ips;
     public Unit(int id, int playerId, double health, double shield, int extraLives, Vec2 position, Double remainingSpawnTime,
             Vec2 velocity, Vec2 direction, double aim, Action action, int healthRegenerationStartTick, WeaponType weapon,
             int nextShotTick, EnumMap<WeaponType, Integer> ammo, int shieldPotions) {
@@ -78,38 +79,35 @@ public class Unit implements Point {
         this.shieldPotions = unit.shieldPotions;
         this.unitOrder = unit.unitOrder;
         this.prevPosition = unit.prevPosition;
-        
-        this.c = unit.c;
-        this.r = unit.r;
-        this.ips = unit.ips;
+
+//        this.c = unit.c;
+//        this.r = unit.r;
+//        this.ips = unit.ips;
     }
 
-    public Vec2 getC() {
-        return c;
-    }
-
-    public void setC(Vec2 c) {
-        this.c = c;
-    }
-
-    public double getR() {
-        return r;
-    }
-
-    public void setR(double r) {
-        this.r = r;
-    }
-
-    public Vec2[] getIps() {
-        return ips;
-    }
-
-    public void setIps(Vec2[] ips) {
-        this.ips = ips;
-    }
-    
-    
-
+//    public Vec2 getC() {
+//        return c;
+//    }
+//
+//    public void setC(Vec2 c) {
+//        this.c = c;
+//    }
+//
+//    public double getR() {
+//        return r;
+//    }
+//
+//    public void setR(double r) {
+//        this.r = r;
+//    }
+//
+//    public Vec2[] getIps() {
+//        return ips;
+//    }
+//
+//    public void setIps(Vec2[] ips) {
+//        this.ips = ips;
+//    }
     public int getId() {
         return id;
     }
@@ -294,6 +292,14 @@ public class Unit implements Point {
 
     public void setIntersectsWithObstacle(boolean intersectsWithObstacle) {
         this.intersectsWithObstacle = intersectsWithObstacle;
+    }
+
+    public boolean isOutsideZone() {
+        return outsideZone;
+    }
+
+    public void setOutsideZone(boolean outsideZone) {
+        this.outsideZone = outsideZone;
     }
 
     @Override

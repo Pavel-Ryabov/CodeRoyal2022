@@ -153,8 +153,8 @@ public class GeoUtil {
         return squaredDistance(c1, c2) <= (r1 + r2) * (r1 + r2);
     }
 
-    public static boolean isIntersect(Vec2 c11, Vec2 c12, double r1, Vec2 c21, Vec2 c22) {
-        return isIntersect(c11.getX(), c11.getY(), c12.getX(), c12.getY(), r1, c21.getX(), c21.getY(), c22.getX(), c22.getY(), 0);
+    public static boolean isIntersect(Vec2 c11, Vec2 c12, double r1, Vec2 c21, Vec2 c22, double r2) {
+        return isIntersect(c11.getX(), c11.getY(), c12.getX(), c12.getY(), r1, c21.getX(), c21.getY(), c22.getX(), c22.getY(), r2);
     }
 
     public static boolean isIntersect(double x11, double y11, double x12, double y12, double r1,
@@ -168,14 +168,35 @@ public class GeoUtil {
         double d = b * b - 4 * a * c;
         if (a != 0 && d >= 0) {
             if (d == 0) {
-                double t = (-b) / 2 * a;
+                double t = (-b) / (2 * a);
                 return t >= 0 && t <= 1;
             }
             double sqrt = Math.sqrt(d);
-            double t1 = (-b + sqrt) / 2 * a;
-            double t2 = (-b - sqrt) / 2 * a;
+            double t1 = (-b + sqrt) / (2 * a);
+            double t2 = (-b - sqrt) / (2 * a);
             return (t1 >= 0 && t1 <= 1) || (t2 >= 0 && t2 <= 1);
         }
         return false;
     }
+
+    public static boolean isIntersect(Vec2 c1, Vec2 v1, double r1, Vec2 c2, Vec2 v2) {
+        Vec2 dc = c2.sub(c1);
+        Vec2 dv = v2.sub(v1);
+        double a = dv.getX() * dv.getX() + dv.getY() * dv.getY();
+        double b = 2 * (dc.getX() * dv.getX() + dc.getY() * dv.getY());
+        double c = dc.getX() * dc.getX() + dc.getY() * dc.getY() - r1 * r1;
+        double d = b * b - 4 * a * c;
+        if (a != 0 && d >= 0) {
+            if (d == 0) {
+                double t = (-b) / (2 * a);
+                return t >= 0 && t <= 1;
+            }
+            double sqrt = Math.sqrt(d);
+            double t1 = (-b + sqrt) / (2 * a);
+            double t2 = (-b - sqrt) / (2 * a);
+            return (t1 >= 0 && t1 <= 1) || (t2 >= 0 && t2 <= 1);
+        }
+        return false;
+    }
+
 }

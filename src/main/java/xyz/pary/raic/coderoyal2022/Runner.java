@@ -29,8 +29,8 @@ public class Runner {
     }
 
     void run() throws IOException {
-        Strategy myStrategy = "test".equals(System.getenv("strategy")) ? new TestStrategy() : new MyStrategy();
         DebugInterface debugInterface = new DebugInterface(inputStream, outputStream);
+        Strategy myStrategy = "test".equals(System.getenv("strategy")) ? new TestStrategy(debugInterface) : new MyStrategy(debugInterface);
         while (true) {
             ServerMessage message = ServerMessage.readFrom(inputStream);
             if (message instanceof ServerMessage.UpdateConstants) {
@@ -38,9 +38,8 @@ public class Runner {
                 Game.CONSTANTS = updateConstantsMessage.getConstants();
             } else if (message instanceof ServerMessage.GetOrder) {
                 ServerMessage.GetOrder getOrderMessage = (ServerMessage.GetOrder) message;
-                new ClientMessage.OrderMessage(myStrategy.getOrder(
-                        getOrderMessage.getPlayerView(), getOrderMessage.isDebugAvailable() ? debugInterface : null
-                )).writeTo(outputStream);
+                debugInterface.setAvailable(getOrderMessage.isDebugAvailable());
+                new ClientMessage.OrderMessage(myStrategy.getOrder(getOrderMessage.getPlayerView())).writeTo(outputStream);
                 outputStream.flush();
             } else if (message instanceof ServerMessage.Finish) {
                 myStrategy.finish();

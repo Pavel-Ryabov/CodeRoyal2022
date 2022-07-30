@@ -5,7 +5,7 @@ import xyz.pary.raic.coderoyal2022.model.Order;
 
 public interface Strategy {
 
-    public Order getOrder(Game game, DebugInterface debugInterface);
+    public Order getOrder(Game game);
 
     public default void debugUpdate(int displayedTick, DebugInterface debugInterface) {
     }

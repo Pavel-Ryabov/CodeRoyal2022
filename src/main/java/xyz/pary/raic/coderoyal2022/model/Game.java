@@ -28,13 +28,13 @@ public class Game {
     private List<Loot.AmmoLoot> ammoLoot;
     private List<Loot.ShieldPotionsLoot> potionLoot;
     private List<Loot.WeaponLoot> weaponLoot;
-    private Projectile[] projectiles;
+    private List<Projectile> projectiles;
     private Zone zone;
     private List<Sound> sounds;
 
     public Game(int myId, Player[] players, int currentTick, List<Unit> myUnits, List<Unit> enemyUnits,
             List<Loot.AmmoLoot> ammoLoot, List<Loot.ShieldPotionsLoot> potionLoot, List<Loot.WeaponLoot> weaponLoot,
-            Projectile[] projectiles, Zone zone, List<Sound> sounds) {
+            List<Projectile> projectiles, Zone zone, List<Sound> sounds) {
         this.myId = myId;
         this.players = players;
         this.currentTick = currentTick;
@@ -112,11 +112,11 @@ public class Game {
         this.weaponLoot = weaponLoot;
     }
 
-    public Projectile[] getProjectiles() {
+    public List<Projectile> getProjectiles() {
         return projectiles;
     }
 
-    public void setProjectiles(Projectile[] projectiles) {
+    public void setProjectiles(List<Projectile> projectiles) {
         this.projectiles = projectiles;
     }
 
@@ -182,11 +182,25 @@ public class Game {
                 }
             }
         }
-        Projectile[] projectiles;
-        projectiles = new Projectile[StreamUtil.readInt(stream)];
-        for (int projectilesIndex = 0; projectilesIndex < projectiles.length; projectilesIndex++) {
+        int projectileCount = StreamUtil.readInt(stream);
+        List<Projectile> projectiles = new ArrayList<>(projectileCount);
+        for (int projectilesIndex = 0; projectilesIndex < projectileCount; projectilesIndex++) {
             Projectile projectilesElement = Projectile.readFrom(stream);
-            projectiles[projectilesIndex] = projectilesElement;
+            if (projectilesElement.getShooterPlayerId() != myId || Game.CONSTANTS.isFriendlyFire()) {
+                double minDist = Double.MAX_VALUE;
+                double dist;
+                for (Unit u : myUnits) {
+                    dist = u.getPosition().squredDistanceTo(projectilesElement.getPosition());
+                    if (dist < minDist) {
+                        minDist = dist;
+                    }
+                }
+                dist = projectilesElement.getLifeTime() * Game.CONSTANTS.getWeapons().get(projectilesElement.getWeaponType()).getProjectileSpeed();
+                if (minDist <= dist * dist) {
+                    projectilesElement.setTick(currentTick);
+                    projectiles.add(projectilesElement);
+                }
+            }
         }
         Zone zone;
         zone = Zone.readFrom(stream);
@@ -231,7 +245,7 @@ public class Game {
         for (Loot lootElement : weaponLoot) {
             lootElement.writeTo(stream);
         }
-        StreamUtil.writeInt(stream, projectiles.length);
+        StreamUtil.writeInt(stream, projectiles.size());
         for (Projectile projectilesElement : projectiles) {
             projectilesElement.writeTo(stream);
         }
@@ -289,13 +303,7 @@ public class Game {
         stringBuilder.append(", ");
         stringBuilder.append("projectiles: ");
         stringBuilder.append("[ ");
-        for (int projectilesIndex = 0; projectilesIndex < projectiles.length; projectilesIndex++) {
-            if (projectilesIndex != 0) {
-                stringBuilder.append(", ");
-            }
-            Projectile projectilesElement = projectiles[projectilesIndex];
-            stringBuilder.append(String.valueOf(projectilesElement));
-        }
+        stringBuilder.append(projectiles.stream().map(u -> u.toString()).collect(Collectors.joining(", ")));
         stringBuilder.append(" ]");
         stringBuilder.append(", ");
         stringBuilder.append("zone: ");
