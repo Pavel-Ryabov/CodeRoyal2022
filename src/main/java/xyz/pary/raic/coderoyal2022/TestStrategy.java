@@ -20,6 +20,8 @@ import xyz.pary.raic.coderoyal2022.util.GeoUtil;
 
 public class TestStrategy implements Strategy {
 
+    private double DT;
+
     private Map<Integer, Unit> res = new HashMap<>();
     private Map<Integer, UnitOrder> actions = new HashMap<>();
     private Map<Integer, Vec2> positions = new HashMap<>();
@@ -125,4 +127,8 @@ public class TestStrategy implements Strategy {
         return new Order(orders);
     }
 
+    @Override
+    public void setDT(double DT) {
+        this.DT = DT;
+    }
 }

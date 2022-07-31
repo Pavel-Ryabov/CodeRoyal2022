@@ -12,4 +12,6 @@ public interface Strategy {
 
     public default void finish() {
     }
+
+    public void setDT(double DT);
 }

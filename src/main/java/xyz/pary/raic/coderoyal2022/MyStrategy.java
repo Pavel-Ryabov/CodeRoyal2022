@@ -37,6 +37,8 @@ public class MyStrategy implements Strategy {
 
     public final DebugInterface di;
 
+    private double DT;
+
     public MyStrategy(DebugInterface di) {
         this.di = di;
     }
@@ -185,19 +187,36 @@ public class MyStrategy implements Strategy {
                 }
             }
             if (enemy != null && action instanceof ActionOrder.Aim) {
+                double speed = Game.CONSTANTS.getWeapons().get(unit.getWeapon()).getProjectileSpeed();
+                Vec2 startPos = unit.getPosition().add(unit.getDirection());
+                Unit enemyCopy = new Unit(enemy);
+                int lifeTime = Game.timeToTicks(Game.CONSTANTS.getWeapons().get(unit.getWeapon()).getProjectileLifeTime());
+                int ticks = 0;
+                while (ticks < Game.timeToTicks(startPos.distanceTo(enemyCopy.getPosition()) / speed) && ticks <= lifeTime) {
+                    Simulator.moveUnit(enemyCopy, enemy.getVelocity().mul(100));
+                    ticks++;
+                }
+                if (ticks <= lifeTime) {
+                    direction = enemyCopy.getPosition();
+                    if (di.isAvailable()) {
+                        di.add(new DebugData.Circle(
+                                enemyCopy.getPosition(), 1, new Color(1, 0, 0, 0.5))
+                        );
+                    }
+                }
                 if (enemy.getRemainingSpawnTime() != null || distanceToEnemy > getMaxDistanceToEnemy(unit)) {
                     ((ActionOrder.Aim) action).setShoot(false);
                 } else {
                     for (Obstacle o : Game.CONSTANTS.getObstacles()) {
                         if (!o.isCanShootThrough() && unit.getPosition().squredDistanceTo(o.getPosition()) < distanceToEnemy * distanceToEnemy) {
-                            if (GeoUtil.isIntersect(unit.getPosition(), enemy.getPosition(), o.getPosition(), o.getRadius())) {
+                            if (GeoUtil.isIntersect(unit.getPosition(), direction, o.getPosition(), o.getRadius())) {
                                 ((ActionOrder.Aim) action).setShoot(false);
                                 if (di.isAvailable()) {
                                     di.add(new DebugData.Ring(
                                             unit.getPosition(), Game.CONSTANTS.getUnitRadius(), 0.25, new Color(0, 0, 1, 0.5))
                                     );
                                     di.add(new DebugData.Ring(
-                                            enemy.getPosition(), Game.CONSTANTS.getUnitRadius(), 0.25, new Color(0, 0, 1, 0.5))
+                                            direction, Game.CONSTANTS.getUnitRadius(), 0.25, new Color(0, 0, 1, 0.5))
                                     );
                                     di.add(new DebugData.Ring(
                                             o.getPosition(), o.getRadius(), 0.25, new Color(1, 0, 0, 0.5))
@@ -256,11 +275,11 @@ public class MyStrategy implements Strategy {
 //                        sound.getPosition(), unit.getPosition(), 0.25, new Color(0, 0, 0, 1))
 //                );
 //            }
-//            if (di.isAvailable() && enemy != null) {
-//                di.add(new DebugData.GradientSegment(
-//                        enemy.getPosition(), new Color(0, 0, 1, 1), unit.getPosition().add(unit.getDirection().mul(20)), new Color(1, 0, 0, 1), 0.25)
-//                );
-//            }
+            if (di.isAvailable() && enemy != null) {
+                di.add(new DebugData.GradientSegment(
+                        unit.getPosition(), new Color(0, 0, 1, 1), unit.getPosition().add(unit.getDirection().mul(30)), new Color(1, 0, 0, 0.5), 0.25)
+                );
+            }
 
             if (unit.getRemainingSpawnTime() == null && !unit.isOutsideZone() && !game.getProjectiles().isEmpty()) {
                 unitOrder = dodge(tick, unit, game.getProjectiles(), unitOrder);
@@ -339,5 +358,10 @@ public class MyStrategy implements Strategy {
             return wp.getProjectileSpeed() * wp.getProjectileLifeTime() * 0.75;
         }
         return Game.CONSTANTS.getViewDistance() * 0.60;
+    }
+
+    @Override
+    public void setDT(double DT) {
+        this.DT = DT;
     }
 }

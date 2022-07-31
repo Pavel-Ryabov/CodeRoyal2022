@@ -3,6 +3,8 @@ package xyz.pary.raic.coderoyal2022;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
+import xyz.pary.raic.coderoyal2022.debugging.Color;
+import xyz.pary.raic.coderoyal2022.debugging.DebugData;
 import xyz.pary.raic.coderoyal2022.model.Action;
 import xyz.pary.raic.coderoyal2022.model.ActionOrder;
 import xyz.pary.raic.coderoyal2022.model.ActionOrderType;
@@ -98,7 +100,67 @@ public class Simulator {
         if (u.isIntersectsWithObstacle()) {
             return;
         }
-        Vec2 targetVel = u.getUnitOrder().getTargetVelocity();
+        moveUnit(u, u.getUnitOrder().getTargetVelocity());
+        if (u.getRemainingSpawnTime() != null) {
+            double respTime = u.getRemainingSpawnTime() - DT;
+            u.setRemainingSpawnTime(respTime - Game.EPS <= 0 ? null : respTime);
+        }
+    }
+
+    private void projectiles() {
+        for (Iterator<Projectile> it = projectiles.iterator(); it.hasNext();) {
+            Projectile p = it.next();
+            Vec2 nextPos = p.getPosition().add(p.getVelocity().mul(DT));
+            if (Runner.di.isAvailable()) {
+                Runner.di.add(new DebugData.Circle(
+                        p.getPosition(), 0.15, new Color(0, 0, 0, 0.5))
+                );
+                Runner.di.add(new DebugData.Circle(
+                        nextPos, 0.25, new Color(1, 0, 0, 0.5))
+                );
+            }
+            while (p.getTick() <= tick) {
+                if (checkIntersection(p, nextPos)) {
+                    it.remove();
+                    break;
+                } else {
+                    p.setLifeTime(p.getLifeTime() - DT);
+                    if (p.getLifeTime() - Game.EPS <= 0) {
+                        it.remove();
+                        break;
+                    } else {
+                        p.setPosition(nextPos);
+                    }
+                }
+                p.setTick(p.getTick() + 1);
+            }
+        }
+    }
+
+    private boolean checkIntersection(Projectile p, Vec2 nextPos) {
+        if (p.getShooterId() == u.getId()) {
+            return false;
+        }
+        if (checkIntersectionWithUnit(p, nextPos, u)) {
+            u.setShield(u.getShield() - Game.CONSTANTS.getWeapons().get(p.getWeaponType()).getProjectileDamage());
+            if (u.getShield() < 0) {
+                u.setHealth(u.getHealth() + u.getShield());
+                u.setShield(0);
+            }
+            return true;
+        }
+        return checkIntersectionWithUObstacles(p, u);
+    }
+
+    public int getTick() {
+        return tick;
+    }
+
+    public Unit getUnit() {
+        return u;
+    }
+
+    public static void moveUnit(Unit u, Vec2 targetVel) {
         Vec2 dv = targetVel.sub(u.getVelocity());
         Vec2 nextVel = dv;
         if (u.getRemainingSpawnTime() != null) {
@@ -152,46 +214,25 @@ public class Simulator {
                 break;
             }
         }
-        if (u.getRemainingSpawnTime() != null) {
-            double respTime = u.getRemainingSpawnTime() - DT;
-            u.setRemainingSpawnTime(respTime - Game.EPS <= 0 ? null : respTime);
-        }
     }
 
-    private void projectiles() {
-        for (Iterator<Projectile> it = projectiles.iterator(); it.hasNext();) {
-            Projectile p = it.next();
-            Vec2 nextPos = p.getPosition().add(p.getVelocity().mul(DT));
-            while (p.getTick() <= tick) {
-                if (checkIntersection(p, nextPos)) {
-                    it.remove();
-                    break;
-                } else {
-                    p.setLifeTime(p.getLifeTime() - DT);
-                    if (p.getLifeTime() - Game.EPS <= 0) {
-                        it.remove();
-                        break;
-                    } else {
-                        p.setPosition(nextPos);
-                    }
-                }
-                p.setTick(p.getTick() + 1);
-            }
-        }
-    }
-
-    private boolean checkIntersection(Projectile p, Vec2 nextPos) {
-        if (p.getShooterId() == u.getId()) {
-            return false;
-        }
-        if (GeoUtil.isIntersect(u.getPrevPosition(), u.getPosition(), Game.CONSTANTS.getUnitRadius(), p.getPosition(), nextPos, 0.05)) {
-            u.setShield(u.getShield() - Game.CONSTANTS.getWeapons().get(p.getWeaponType()).getProjectileDamage());
-            if (u.getShield() < 0) {
-                u.setHealth(u.getHealth() + u.getShield());
-                u.setShield(0);
-            }
+    public static boolean moveProjectile(Projectile p, Unit u) {
+        Vec2 nextPos = p.getPosition().add(p.getVelocity().mul(DT));
+        if (checkIntersectionWithUnit(p, nextPos, u)) {
+            p.setRemoved(true);
             return true;
         }
+        if (checkIntersectionWithUObstacles(p, u)) {
+            p.setRemoved(true);
+        }
+        return false;
+    }
+
+    private static boolean checkIntersectionWithUnit(Projectile p, Vec2 nextPos, Unit u) {
+        return GeoUtil.isIntersect(u.getPrevPosition(), u.getPosition(), Game.CONSTANTS.getUnitRadius(), p.getPosition(), nextPos, 0.05);
+    }
+
+    private static boolean checkIntersectionWithUObstacles(Projectile p, Unit u) {
         for (Obstacle o : Game.CONSTANTS.getObstacles()) {
             double dToO = p.getPosition().squredDistanceTo(o.getPosition());
             double dToU = p.getPosition().squredDistanceTo(u.getPosition());
@@ -204,13 +245,4 @@ public class Simulator {
         }
         return false;
     }
-
-    public int getTick() {
-        return tick;
-    }
-
-    public Unit getUnit() {
-        return u;
-    }
-
 }

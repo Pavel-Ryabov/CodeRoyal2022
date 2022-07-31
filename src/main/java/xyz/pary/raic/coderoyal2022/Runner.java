@@ -13,6 +13,8 @@ import xyz.pary.raic.coderoyal2022.util.StreamUtil;
 
 public class Runner {
 
+    public static DebugInterface di;
+
     private final InputStream inputStream;
     private final OutputStream outputStream;
 
@@ -29,16 +31,17 @@ public class Runner {
     }
 
     void run() throws IOException {
-        DebugInterface debugInterface = new DebugInterface(inputStream, outputStream);
-        Strategy myStrategy = "test".equals(System.getenv("strategy")) ? new TestStrategy(debugInterface) : new MyStrategy(debugInterface);
+        di = new DebugInterface(inputStream, outputStream);
+        Strategy myStrategy = "test".equals(System.getenv("strategy")) ? new TestStrategy(di) : new MyStrategy(di);
         while (true) {
             ServerMessage message = ServerMessage.readFrom(inputStream);
             if (message instanceof ServerMessage.UpdateConstants) {
                 ServerMessage.UpdateConstants updateConstantsMessage = (ServerMessage.UpdateConstants) message;
                 Game.CONSTANTS = updateConstantsMessage.getConstants();
+                myStrategy.setDT(1.0 / Game.CONSTANTS.getTicksPerSecond());
             } else if (message instanceof ServerMessage.GetOrder) {
                 ServerMessage.GetOrder getOrderMessage = (ServerMessage.GetOrder) message;
-                debugInterface.setAvailable(getOrderMessage.isDebugAvailable());
+                di.setAvailable(getOrderMessage.isDebugAvailable());
                 new ClientMessage.OrderMessage(myStrategy.getOrder(getOrderMessage.getPlayerView())).writeTo(outputStream);
                 outputStream.flush();
             } else if (message instanceof ServerMessage.Finish) {
@@ -46,7 +49,7 @@ public class Runner {
                 break;
             } else if (message instanceof ServerMessage.DebugUpdate) {
                 ServerMessage.DebugUpdate debugUpdateMessage = (ServerMessage.DebugUpdate) message;
-                myStrategy.debugUpdate(debugUpdateMessage.getDisplayedTick(), debugInterface);
+                myStrategy.debugUpdate(debugUpdateMessage.getDisplayedTick(), di);
                 new ClientMessage.DebugUpdateDone().writeTo(outputStream);
                 outputStream.flush();
             } else {

@@ -16,6 +16,7 @@ public class Projectile implements Point {
     private double lifeTime;
 
     private int tick;
+    private boolean removed;
 
     public Projectile(int id, int weaponTypeIndex, int shooterId, int shooterPlayerId, Vec2 position, Vec2 velocity, double lifeTime) {
         this.id = id;
@@ -25,7 +26,6 @@ public class Projectile implements Point {
         this.position = position;
         this.velocity = velocity;
         this.lifeTime = lifeTime;
-        this.tick = tick;
     }
 
     public Projectile(Projectile projectile) {
@@ -101,6 +101,14 @@ public class Projectile implements Point {
 
     public void setTick(int tick) {
         this.tick = tick;
+    }
+
+    public boolean isRemoved() {
+        return removed;
+    }
+
+    public void setRemoved(boolean removed) {
+        this.removed = removed;
     }
 
     @Override
