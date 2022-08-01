@@ -35,6 +35,7 @@ public class Unit implements Point {
     private boolean intersectsWithObstacle;
 
     private boolean outsideZone;
+    private int tick;
 
 //    private Vec2 c ;
 //    private double r;
@@ -300,6 +301,14 @@ public class Unit implements Point {
 
     public void setOutsideZone(boolean outsideZone) {
         this.outsideZone = outsideZone;
+    }
+
+    public int getTick() {
+        return tick;
+    }
+
+    public void setTick(int tick) {
+        this.tick = tick;
     }
 
     @Override

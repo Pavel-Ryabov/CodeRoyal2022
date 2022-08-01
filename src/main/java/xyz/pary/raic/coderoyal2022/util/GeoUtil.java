@@ -199,4 +199,17 @@ public class GeoUtil {
         return false;
     }
 
+    public static boolean isInsideCircleSector(Vec2 point, Vec2 center, double r, Vec2 direction, double angle) {
+        double ha = angle / 2;
+        Vec2 s = direction.rotate(ha, false);
+        Vec2 e = direction.rotate(ha);
+        Vec2 p = point.sub(center);
+        if (-s.getX() * p.getY() + s.getY() * p.getX() > 0) {
+            return false;
+        }
+        if (-e.getX() * p.getY() + e.getY() * p.getX() <= 0) {
+            return false;
+        }
+        return p.squaredLength() <= r * r;
+    }
 }

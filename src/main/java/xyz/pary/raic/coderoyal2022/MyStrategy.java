@@ -63,7 +63,8 @@ public class MyStrategy implements Strategy {
         for (Unit unit : game.getMyUnits()) {
             Vec2 target = null;
             Vec2 direction = null;
-            Unit enemy = GeoUtil.getNearestTarget(unit, game.getEnemyUnits());
+            Unit enemy = GeoUtil.getNearestTarget(unit, game.getEnemyUnits().stream()
+                    .filter(e -> e.getRemainingSpawnTime() == null || e.getRemainingSpawnTime() <= 5 * DT).collect(Collectors.toList()));
             Sound sound = GeoUtil.getNearestTarget(unit, this.sounds);
             ActionOrder action = null;
             double distanceToEnemy = 0;
@@ -121,7 +122,16 @@ public class MyStrategy implements Strategy {
                         }
                         if (l.getItemType() == ItemType.AMMO && ((AmmoLoot) l).getItem().getWeaponType() == unit.getWeapon()
                                 && unit.getAmmo().get(unit.getWeapon()) < Game.CONSTANTS.getWeapons().get(unit.getWeapon()).getMaxInventoryAmmo()) {
-                            action = new ActionOrder.Pickup(l.getId());
+                            AmmoLoot ammo = GeoUtil.getNearestTarget(unit, game.getAmmoLoot().stream().
+                                    filter(a -> a.getItem().getWeaponType() == unit.getWeapon()).collect(Collectors.toList()));
+                            if (ammo != null) {
+                                game.getAmmoLoot().remove(ammo);
+                                target = ammo.getPosition();
+                                direction = ammo.getPosition();
+                                if (unit.getPosition().distanceTo(ammo.getPosition()) <= Game.CONSTANTS.getUnitRadius()) {
+                                    action = new ActionOrder.Pickup(ammo.getId());
+                                }
+                            }
                             break;
                         }
                         if (l.getItemType() == ItemType.SHIELD_POTION) {
@@ -204,7 +214,7 @@ public class MyStrategy implements Strategy {
                         );
                     }
                 }
-                if (enemy.getRemainingSpawnTime() != null || distanceToEnemy > getMaxDistanceToEnemy(unit)) {
+                if ((enemy.getRemainingSpawnTime() != null && enemy.getRemainingSpawnTime() > 5 * DT) || distanceToEnemy > getMaxDistanceToEnemy(unit)) {
                     ((ActionOrder.Aim) action).setShoot(false);
                 } else {
                     for (Obstacle o : Game.CONSTANTS.getObstacles()) {
