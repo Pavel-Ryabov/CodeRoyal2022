@@ -214,8 +214,8 @@ public class MyStrategy implements Strategy {
                         );
                     }
                 }
-                if ((enemy.getRemainingSpawnTime() != null && enemy.getRemainingSpawnTime() > 5 * DT) || distanceToEnemy > getMaxDistanceToEnemy(unit)) {
-                    ((ActionOrder.Aim) action).setShoot(false);
+                if (distanceToEnemy > getMaxDistanceToEnemy(unit)) {
+                    action = null;
                 } else {
                     for (Obstacle o : Game.CONSTANTS.getObstacles()) {
                         if (!o.isCanShootThrough() && unit.getPosition().squredDistanceTo(o.getPosition()) < distanceToEnemy * distanceToEnemy) {
